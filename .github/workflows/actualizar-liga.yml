@@ -1,0 +1,71 @@
+name: Actualizar datos de la liga
+
+# Los partidos de la Zapping Liga Premier son todos SÁBADOS (18:00–20:00, UTC-3),
+# así que los resultados se publican la noche del sábado. El chequeo importante es
+# el de la madrugada del domingo. El de mitad de semana existe porque el fixture
+# también cambia fuera de partido: a las fechas 4 y 5 todavía les falta día asignado
+# y se van poblando con el correr del torneo (además de fotos nuevas en la galería).
+#
+# Las expresiones cron de GitHub Actions van en UTC. Chile es UTC-3:
+#   04:00 UTC = 01:00 en Chile   |   13:00 UTC = 10:00 en Chile
+on:
+  schedule:
+    - cron: '0 4 * * 0'    # domingos 01:00 (Chile) -> resultados del sábado
+    - cron: '0 13 * * 3'   # miércoles 10:00 (Chile) -> fixture/fotos nuevas
+  workflow_dispatch:        # botón para correrlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write
+
+# Si una corrida se solapa con otra, cancela la vieja en vez de pelear por el push
+concurrency:
+  group: actualizar-liga
+  cancel-in-progress: true
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # El script sale con código != 0 si la API falla o si los datos salen
+      # incoherentes. En ese caso el job se corta ACÁ y no se commitea nada:
+      # el sitio se queda con el último dato bueno.
+      - name: Extraer datos de Copa Fácil
+        run: python3 scripts/extraer-liga.py
+
+      - name: Commit y push si hubo cambios
+        run: |
+          if git diff --quiet -- data/; then
+            echo "Sin cambios en los datos — no hay nada que commitear."
+            exit 0
+          fi
+
+          # Resumen legible para el mensaje de commit (posicion de Real Betits)
+          RESUMEN=$(python3 - <<'PY'
+          import json
+          d = json.load(open("data/liga.json"))
+          for grupo, filas in d["tabla"].items():
+              for f in filas:
+                  if f["equipo"] == "REAL BETITS":
+                      print(f"{f['pos']}do del grupo {grupo}, {f['pts']} pts")
+          jugados = sum(1 for m in d["fixture"] if m["jugado"])
+          print(f"{jugados}/{len(d['fixture'])} partidos jugados")
+          PY
+          )
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "data: actualizar liga ($(date -u +%Y-%m-%d))" -m "$RESUMEN"
+          git push
+
+      # Cuando exista el sitio, el deploy se dispara con el push de arriba.
+      # Si usas GitHub Pages, agrega acá los steps de build y deploy (o un
+      # workflow aparte que escuche a los cambios en data/).
