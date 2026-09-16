@@ -7,21 +7,37 @@ Fuente (NO oficial, es la API interna que usa la propia web de Copa Fácil):
   - División:    -hdryi@x7miv  (Sábado 2° DIV Zapping)
 
 Endpoints usados (todos públicos, sin login):
-  - https://copafacil.com/request/event?id=<evento>          -> info del torneo
+  - https://copafacil.com/request/event?id=<evento>                -> info del torneo
   - https://copafacil-web.firebaseio.com/events/<evt>/matchs.json  -> todos los partidos
   - https://copafacil-web.firebaseio.com/events/<evt>/midia.json   -> galería/noticias
   - https://copafacil-storage.b-cdn.net/events%2F<evt>%2F<div>%2Fteams%2F<id>.png
 
-Uso:  python3 extraer-liga.py
-Salida: ~/real-betits/data/liga.json  + ~/real-betits/data/logos/
+Uso:   python3 scripts/extraer-liga.py
+Salida: data/liga.json  +  data/logos/
+
+RED DE SEGURIDAD: si la descarga falla o los datos nuevos salen incoherentes, el script
+sale con código != 0 y **NO toca** el liga.json existente. Así el sitio (y el Action)
+se quedan con el último dato bueno en vez de publicar basura.
 """
-import json, os, subprocess, collections, datetime as dt
+import json
+import os
+import sys
+import time
+import collections
+import subprocess
+import datetime as dt
 
 EVT = "-hdryi"
 DIV = "-hdryi@x7miv"
 BASE = "https://copafacil-web.firebaseio.com"
 SITE = "https://copafacil.com"
-DATA = os.path.expanduser("~/real-betits/data")
+STORAGE = "https://copafacil-storage.b-cdn.net"
+
+# Rutas relativas al repo (funciona igual en local que en GitHub Actions)
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA = os.path.join(REPO, "data")
+OUT = os.path.join(DATA, "liga.json")
+LOGO_DIR = os.path.join(DATA, "logos")
 
 # IDs internos de equipo -> nombre (confirmado cruzando GF/GA/Pts con la tabla de la app)
 MAPPING = {
@@ -40,12 +56,27 @@ MAPPING = {
 }
 
 
-def get_json(url):
-    r = subprocess.run(["curl", "-s", "-m", "30", url], capture_output=True, text=True)
-    try:
-        return json.loads(r.stdout)
-    except Exception:
-        return None
+def fail(msg):
+    print(f"ERROR: {msg}", file=sys.stderr)
+    print("NO se modificó data/liga.json — se conserva el último dato bueno.", file=sys.stderr)
+    sys.exit(1)
+
+
+def get_json(url, intentos=3):
+    """Baja y parsea JSON, con reintentos. Devuelve None si no lo logra."""
+    for i in range(intentos):
+        r = subprocess.run(["curl", "-sS", "-m", "30", "-w", "\n%{http_code}", url],
+                           capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout:
+            cuerpo, _, code = r.stdout.rpartition("\n")
+            if code.strip() == "200":
+                try:
+                    return json.loads(cuerpo)
+                except json.JSONDecodeError:
+                    pass
+        if i < intentos - 1:
+            time.sleep(2 * (i + 1))
+    return None
 
 
 def fdate(ms):
@@ -60,14 +91,101 @@ def slug(name):
     return name.lower().replace(" ", "-")
 
 
+def construir_tabla(sub):
+    """Tabla POR GRUPO. Los grupos salen de las componentes conexas del grafo de partidos
+    (dos equipos que se enfrentan comparten grupo), así que no hay que hardcodearlos."""
+    todos = [(MAPPING.get(v["team1"], v["team1"]), MAPPING.get(v["team2"], v["team2"]))
+             for v in sub.values()]
+    jugados = [(MAPPING.get(v["team1"], v["team1"]), MAPPING.get(v["team2"], v["team2"]), v)
+               for v in sub.values() if v.get("st") == 3]
+
+    padre = {n: n for n in {x for par in todos for x in par}}
+
+    def find(x):
+        while padre[x] != x:
+            padre[x] = padre[padre[x]]
+            x = padre[x]
+        return x
+
+    for a, b in todos:
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            padre[ra] = rb
+
+    grupos = collections.defaultdict(set)
+    for n in padre:
+        grupos[find(n)].add(n)
+
+    def tabla_de(equipos):
+        gf, ga, pj = collections.Counter(), collections.Counter(), collections.Counter()
+        pts, W, D, L = (collections.Counter() for _ in range(4))
+        for t1, t2, v in jugados:
+            if t1 not in equipos:
+                continue
+            dtx = v.get("dt") or {}
+            # OJO: un partido jugado puede traer solo un lado del marcador; el ausente es 0.
+            g1, g2 = dtx.get("qt_g1", 0), dtx.get("qt_g2", 0)
+            gf[t1] += g1; ga[t1] += g2; gf[t2] += g2; ga[t2] += g1
+            pj[t1] += 1; pj[t2] += 1
+            if g1 > g2:
+                pts[t1] += 3; W[t1] += 1; L[t2] += 1
+            elif g2 > g1:
+                pts[t2] += 3; W[t2] += 1; L[t1] += 1
+            else:
+                pts[t1] += 1; pts[t2] += 1; D[t1] += 1; D[t2] += 1
+        return [{"pos": i, "equipo": n, "pts": pts[n], "pj": pj[n], "w": W[n], "d": D[n],
+                 "l": L[n], "gf": gf[n], "ga": ga[n], "gd": gf[n] - ga[n]}
+                for i, n in enumerate(sorted(equipos, key=lambda n: (-pts[n], -(gf[n] - ga[n]), -gf[n])), 1)]
+
+    # La LETRA (A/B) no se deduce de los datos: es orden interno de la app. Se ancla
+    # a un equipo conocido de cada grupo (confirmado en la UI de copafacil).
+    ANCLAS = {"A": "PICHULENSE FC", "B": "REAL BETITS"}
+    ordenados = sorted(grupos.values(), key=lambda s: sorted(s)[0])
+    table, usados = {}, []
+    for letra, ancla in ANCLAS.items():
+        for equipos in ordenados:
+            if ancla in equipos:
+                table[letra] = tabla_de(equipos)
+                usados.append(id(equipos))
+                break
+    for equipos in ordenados:  # grupos extra, si algún día hubiera más de dos
+        if id(equipos) not in usados:
+            table[f"G{len(table) + 1}"] = tabla_de(equipos)
+    return table
+
+
+def descargar_logos():
+    os.makedirs(LOGO_DIR, exist_ok=True)
+    bajar = []
+    for tid, name in MAPPING.items():
+        for ext in ("png", "jpg"):
+            url = f"{STORAGE}/events%2F{EVT}%2Fx7miv%2Fteams%2F{tid}.{ext}?alt=media&token=1"
+            dest = os.path.join(LOGO_DIR, f"{slug(name)}.{ext}")
+            if os.path.exists(dest) and os.path.getsize(dest) > 0:
+                break  # ya lo tenemos, no re-descargar (evita diffs inútiles)
+            r = subprocess.run(["curl", "-s", "-m", "20", "-o", dest, "-w", "%{http_code}", url],
+                               capture_output=True, text=True)
+            if r.stdout.strip() == "200" and os.path.exists(dest) and os.path.getsize(dest) > 0:
+                bajar.append(name)
+                break
+            if os.path.exists(dest):
+                os.remove(dest)  # 404 -> no dejar archivo vacío
+    return bajar
+
+
 def main():
     os.makedirs(DATA, exist_ok=True)
 
-    matchs = get_json(f"{BASE}/events/{EVT}/matchs.json") or {}
+    matchs = get_json(f"{BASE}/events/{EVT}/matchs.json")
+    if not isinstance(matchs, dict) or not matchs:
+        fail("no se pudo descargar la lista de partidos (¿API caída o cambiada?)")
+
     midia = get_json(f"{BASE}/events/{EVT}/midia.json") or {}
     info = get_json(f"{SITE}/request/event?id={EVT}") or {}
 
     sub = {k: v for k, v in matchs.items() if v.get("evt") == DIV}
+    if not sub:
+        fail(f"la división {DIV} no devolvió ningún partido")
 
     # --- fixture ---
     fixture = []
@@ -85,68 +203,7 @@ def main():
         })
     fixture.sort(key=lambda x: (x["fecha"] or "9999", x["id"]))
 
-    # --- tabla, POR GRUPO ---
-    # El torneo tiene grupos (A, B) y la app muestra una tabla por grupo, no una global.
-    # Los grupos se descubren por componentes conexas del grafo de partidos: dos equipos
-    # que se enfrentan están en el mismo grupo. Así no hay que hardcodear los grupos.
-    jugados = [(MAPPING.get(v["team1"], v["team1"]), MAPPING.get(v["team2"], v["team2"]), v)
-               for v in sub.values() if v.get("st") == 3]
-    todos = [(MAPPING.get(v["team1"], v["team1"]), MAPPING.get(v["team2"], v["team2"]))
-             for v in sub.values()]
-
-    padre = {n: n for n in set(sum([list(p) for p in todos], []))}
-    def find(x):
-        while padre[x] != x:
-            padre[x] = padre[padre[x]]
-            x = padre[x]
-        return x
-    for a, b in todos:
-        ra, rb = find(a), find(b)
-        if ra != rb:
-            padre[ra] = rb
-
-    grupos = collections.defaultdict(set)
-    for n in padre:
-        grupos[find(n)].add(n)
-
-    def tabla_de(equipos):
-        gf, ga, pj = collections.Counter(), collections.Counter(), collections.Counter()
-        pts, W, D, L = (collections.Counter() for _ in range(4))
-        for t1, t2, v in jugados:
-            if t1 not in equipos:
-                continue
-            dtx = v.get("dt") or {}
-            g1, g2 = dtx.get("qt_g1", 0), dtx.get("qt_g2", 0)
-            gf[t1] += g1; ga[t1] += g2; gf[t2] += g2; ga[t2] += g1
-            pj[t1] += 1; pj[t2] += 1
-            if g1 > g2:
-                pts[t1] += 3; W[t1] += 1; L[t2] += 1
-            elif g2 > g1:
-                pts[t2] += 3; W[t2] += 1; L[t1] += 1
-            else:
-                pts[t1] += 1; pts[t2] += 1; D[t1] += 1; D[t2] += 1
-        rows = []
-        for i, n in enumerate(sorted(equipos, key=lambda n: (-pts[n], -(gf[n] - ga[n]), -gf[n])), 1):
-            rows.append({"pos": i, "equipo": n, "pts": pts[n], "pj": pj[n], "w": W[n],
-                         "d": D[n], "l": L[n], "gf": gf[n], "ga": ga[n], "gd": gf[n] - ga[n]})
-        return rows
-
-    # El nombre de la letra (A/B) NO se puede derivar de los datos: la app lo tiene por orden
-    # de creación del grupo. Se ancla a un equipo conocido de cada grupo (confirmado en la UI).
-    ANCLAS = {"A": "PICHULENSE FC", "B": "REAL BETITS"}
-    ordenados = sorted(grupos.values(), key=lambda s: sorted(s)[0])
-    table = {}
-    usados = []
-    for letra, ancla in ANCLAS.items():
-        for equipos in ordenados:
-            if ancla in equipos:
-                table[letra] = tabla_de(equipos)
-                usados.append(id(equipos))
-                break
-    for equipos in ordenados:  # grupos extra, si algún día hubiera más
-        if id(equipos) in usados:
-            continue
-        table[f"G{len(table)+1}"] = tabla_de(equipos)
+    table = construir_tabla(sub)
 
     # --- galería ---
     gallery = []
@@ -157,22 +214,28 @@ def main():
                         "es_mi_division": v.get("evt") == "x7miv"})
     gallery.sort(key=lambda x: (x["titulo"] or ""))
 
-    # --- logos ---
-    logo_dir = os.path.join(DATA, "logos")
-    os.makedirs(logo_dir, exist_ok=True)
-    for tid, name in MAPPING.items():
-        for ext in ("png", "jpg"):
-            url = f"https://copafacil-storage.b-cdn.net/events%2F{EVT}%2Fx7miv%2Fteams%2F{tid}.{ext}?alt=media&token=1"
-            p = os.path.join(logo_dir, f"{slug(name)}.{ext}")
-            r = subprocess.run(["curl", "-s", "-m", "20", "-o", p, "-w", "%{http_code}", url],
-                               capture_output=True, text=True)
-            if r.stdout.strip() == "200" and os.path.getsize(p) > 0:
-                break
-            if os.path.exists(p):
-                os.remove(p)
+    # ---------- VALIDACIÓN: no degradar lo que ya teníamos ----------
+    jugados_nuevos = sum(1 for x in fixture if x["jugado"])
+    if os.path.exists(OUT):
+        try:
+            viejo = json.load(open(OUT))
+            jugados_viejos = sum(1 for x in viejo.get("fixture", []) if x.get("jugado"))
+            if jugados_nuevos < jugados_viejos:
+                fail(f"regresión: ahora hay {jugados_nuevos} partidos jugados y antes había "
+                     f"{jugados_viejos}. Los partidos jugados no deberían desaparecer.")
+        except (json.JSONDecodeError, OSError):
+            print("aviso: no se pudo leer el liga.json previo, se sobrescribe", file=sys.stderr)
 
+    if not table or not any(table.values()):
+        fail("la tabla de posiciones salió vacía")
+
+    # --- logos ---
+    nuevos_logos = descargar_logos()
+
+    # Sin timestamp a propósito: así el archivo solo cambia cuando cambian los DATOS,
+    # y el Action no hace un commit diario vacío. La fecha queda en el historial de git.
     dataset = {
-        "fuente": f"{SITE}/-hdryi@x7miv",
+        "fuente": f"{SITE}/{DIV}",
         "torneo": info.get("info", {}),
         "mi_equipo": "REAL BETITS",
         "division_id": DIV,
@@ -180,19 +243,20 @@ def main():
         "fixture": fixture,
         "galeria": gallery,
     }
-    out = os.path.join(DATA, "liga.json")
-    json.dump(dataset, open(out, "w"), ensure_ascii=False, indent=1)
+    with open(OUT, "w") as f:
+        json.dump(dataset, f, ensure_ascii=False, indent=1)
+        f.write("\n")
 
-    jug = sum(1 for x in fixture if x["jugado"])
     n_equipos = sum(len(rows) for rows in table.values())
-    print(f"OK -> {out}")
-    print(f"  partidos: {len(fixture)} ({jug} jugados, {len(fixture)-jug} pendientes)")
+    print(f"OK -> {os.path.relpath(OUT, REPO)}")
+    print(f"  partidos: {len(fixture)} ({jugados_nuevos} jugados, {len(fixture) - jugados_nuevos} pendientes)")
     print(f"  tabla: {len(table)} grupos / {n_equipos} equipos | galería: {len(gallery)} items")
     for g, rows in table.items():
         mia = next((r for r in rows if r["equipo"] == "REAL BETITS"), None)
         if mia:
             print(f"  REAL BETITS: {mia['pos']}° del grupo {g} ({mia['pts']} pts)")
-    print(f"  logos: {len(os.listdir(logo_dir))}/12 descargados")
+    print(f"  logos: {len(os.listdir(LOGO_DIR))} archivos"
+          + (f" (nuevos: {', '.join(nuevos_logos)})" if nuevos_logos else ""))
 
 
 if __name__ == "__main__":
