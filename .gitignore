@@ -1,0 +1,24 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Build de Astro
+dist/
+.astro/
+.output/
+
+# Entorno
+.env
+.env.production
+.env.local
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
