@@ -173,6 +173,30 @@ def construir_tabla(sub):
     return table
 
 
+def optimizar_logo(ruta):
+    """Genera el .webp del logo (192px) al lado del original.
+
+    El sitio prefiere el .webp y el PNG/JPG queda como fuente en el repo. Si no
+    hay ImageMagick a mano, se deja el PNG nomas: el sitio funciona igual, solo
+    pesa mas. Devuelve la ruta del .webp o None.
+    """
+    webp = os.path.splitext(ruta)[0] + ".webp"
+    if os.path.exists(webp) and os.path.getsize(webp) > 0:
+        return webp  # ya esta, no re-hacer (evita diffs inutiles)
+    for cmd in ("magick", "convert"):
+        try:
+            r = subprocess.run([cmd, ruta, "-resize", "192x", "-strip", "-quality", "90", webp],
+                               capture_output=True)
+        except FileNotFoundError:
+            continue
+        if r.returncode == 0 and os.path.exists(webp) and os.path.getsize(webp) > 0:
+            return webp
+        if os.path.exists(webp):
+            os.remove(webp)
+    print("  aviso: no hay ImageMagick, los logos quedan en PNG")
+    return None
+
+
 def descargar_logos():
     os.makedirs(LOGO_DIR, exist_ok=True)
     bajar = []
@@ -181,10 +205,12 @@ def descargar_logos():
             url = f"{STORAGE}/events%2F{EVT}%2Fx7miv%2Fteams%2F{tid}.{ext}?alt=media&token=1"
             dest = os.path.join(LOGO_DIR, f"{slug(name)}.{ext}")
             if os.path.exists(dest) and os.path.getsize(dest) > 0:
+                optimizar_logo(dest)  # versiones de antes de esta optimizacion
                 break  # ya lo tenemos, no re-descargar (evita diffs inútiles)
             r = subprocess.run(["curl", "-s", "-m", "20", "-o", dest, "-w", "%{http_code}", url],
                                capture_output=True, text=True)
             if r.stdout.strip() == "200" and os.path.exists(dest) and os.path.getsize(dest) > 0:
+                optimizar_logo(dest)
                 bajar.append(name)
                 break
             if os.path.exists(dest):

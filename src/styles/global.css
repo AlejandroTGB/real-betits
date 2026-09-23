@@ -1,6 +1,6 @@
 /* ==========================================================================
    Design tokens de Real Betits
-   Los valores marcados "medido" salen del escudo real (src/assets/escudo.png),
+   Los valores marcados "medido" salen del escudo real (src/assets/escudo.webp),
    muestreados pixel a pixel. La rampa de verdes se deriva levantando ese verde
    base, porque el del escudo (#05190f) es casi negro y solo no alcanza para
    construir jerarquía visual.

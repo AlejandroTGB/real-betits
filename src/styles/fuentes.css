@@ -1,0 +1,70 @@
+/* Tipografías propias.
+ *
+ * Antes se pedían a fonts.googleapis.com. Eso significaba: DNS + TLS a otra
+ * máquina, un dominio más que resolver y una hoja de estilos ajena que bloquea
+ * el pintado del texto. Ahora son archivos del propio dominio (public/fuentes/).
+ *
+ * Son el subset "latin" de Google Fonts: alcanza y sobra para el español
+ * (á é í ó ú ü ñ ¿ ¡ ° ·). El navegador descarga SOLO los pesos que la página
+ * usa de verdad, no los siete archivos.
+ *
+ * ⚠️ Si algún día hace falta un peso nuevo, hay que bajarlo: no alcanza con
+ * escribirlo acá. Están los 7 que usa el diseño (Barlow 500/600/700/800 +
+ * Inter 400/500/600).
+ */
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fuentes/barlow-condensed-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fuentes/barlow-condensed-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fuentes/barlow-condensed-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fuentes/barlow-condensed-800.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fuentes/inter-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fuentes/inter-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fuentes/inter-600.woff2') format('woff2');
+}

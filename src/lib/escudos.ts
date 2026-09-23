@@ -9,9 +9,9 @@
  * devuelve null y quien lo use decide qué hacer (nosotros reservamos el espacio
  * igual, para que la fila no quede desbalanceada).
  */
-import propio from '../assets/escudo.png';
+import propio from '../assets/escudo.webp';
 
-const ARCHIVOS = import.meta.glob('../../data/logos/*.{png,jpg}', {
+const ARCHIVOS = import.meta.glob('../../data/logos/*.{png,jpg,webp}', {
   eager: true,
   query: '?url',
   import: 'default',
@@ -40,9 +40,11 @@ export const escudoPropio: string = propio.src;
 
 export function escudoDe(nombre: string): string | null {
   const buscado = slugEquipo(nombre);
-  for (const [ruta, url] of Object.entries(ARCHIVOS)) {
-    const archivo = ruta.split('/').pop() ?? '';
-    if (archivo === `${buscado}.png` || archivo === `${buscado}.jpg`) return url;
+  // Se prefiere el .webp: el PNG/JPG original se queda en el repo como fuente,
+  // pero no se sirve (el .webp pesa ~5x menos y se ve igual).
+  for (const ext of ['webp', 'png', 'jpg']) {
+    const url = ARCHIVOS[`../../data/logos/${buscado}.${ext}`];
+    if (url) return url;
   }
   return null;
 }

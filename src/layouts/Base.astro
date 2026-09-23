@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/fuentes.css';
 
 interface Props {
   titulo: string;
@@ -15,11 +16,23 @@ const { titulo, descripcion = 'Real Betits — Zapping Liga Premier' } = Astro.p
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" href="/escudo.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {/* Las fuentes las sirve el propio sitio (public/fuentes/), así que ya no hay
+        preconnect ni hoja de estilos ajena bloqueando el pintado. Se precargan
+        solo las dos que definen la primera pintada: el display de los títulos y
+        el texto del cuerpo. Los demás pesos llegan cuando hacen falta. */}
     <link
-      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fuentes/barlow-condensed-700.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fuentes/inter-400.woff2"
+      crossorigin
     />
     <meta name="generator" content={Astro.generator} />
     <title>{titulo}</title>
