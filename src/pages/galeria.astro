@@ -1,0 +1,85 @@
+---
+/**
+ * Galería: las fotos de nuestros partidos, fecha por fecha.
+ *
+ * Cada álbum es una fecha jugada, con su rival y su resultado, y un enlace al
+ * álbum completo en Drive. Los álbumes los publica la liga y los busca
+ * scripts/extraer-liga.py, así que una fecha nueva aparece sola cuando el Action
+ * corre (queda pendiente solo resolver en qué turno de cancha 4 quedamos, ver
+ * data/galeria-carpetas.json).
+ *
+ * El crédito no es un adorno: las fotos son de la fotografía oficial de la liga.
+ */
+import Sitio from '../layouts/Sitio.astro';
+import Album from '../components/Album.astro';
+import { ALBUMES } from '../lib/galeria';
+import { JORNADAS, resultado, marcadorTexto, fechaLarga } from '../lib/liga';
+
+const ROTULO: Record<string, string> = { G: 'Ganado', E: 'Empate', P: 'Perdido' };
+
+/**
+ * Cada álbum, cruzado con su partido para poder poner rival y resultado.
+ * Los álbumes vienen numerados por fecha (1, 2, 3…) y JORNADAS está en orden de
+ * calendario, así que el índice es la fecha menos uno.
+ */
+const albumes = ALBUMES.map((a) => {
+  const j = JORNADAS[a.fecha - 1];
+  const r = j ? resultado(j.nuestro) : null;
+  return {
+    album: a,
+    rival: j ? j.rival : '',
+    marcador: j ? marcadorTexto(j.nuestro) : '',
+    cuando: j ? fechaLarga(j.nuestro.fecha) : '',
+    rotulo: r ? ROTULO[r] : null,
+  };
+});
+---
+
+<Sitio
+  titulo="Galería — Real Betits"
+  descripcion="Las fotos de los partidos de Real Betits en la Zapping Liga Premier, Sábado 2° DIV, fecha por fecha."
+>
+  <section class="seccion">
+    <header class="seccion__cabecera">
+      <h2 class="seccion__titulo">Galería</h2>
+    </header>
+
+    {
+      albumes.length > 0 ? (
+        albumes.map((x) => (
+          <Album
+            album={x.album}
+            rival={x.rival}
+            marcador={x.marcador}
+            cuando={x.cuando}
+            rotulo={x.rotulo}
+          />
+        ))
+      ) : (
+        <p class="sin-fotos">Todavía no hay álbumes publicados de nuestras fechas.</p>
+      )
+    }
+
+    <p class="credito">
+      Fotos: fotografía oficial de la liga (Liga Premier), publicadas en el Drive
+      del torneo. Acá va una selección; el resto está en cada álbum.
+    </p>
+  </section>
+</Sitio>
+
+<style>
+  .sin-fotos {
+    margin: 0;
+    font-size: 15px;
+    color: rgb(229 225 222 / 0.55);
+  }
+
+  .credito {
+    margin: 54px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid rgb(195 147 80 / 0.18);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: rgb(229 225 222 / 0.42);
+  }
+</style>

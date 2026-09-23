@@ -1,0 +1,7 @@
+{
+  "nota": "Qué carpeta de cancha 4 de cada jornada es la NUESTRA. Se juega siempre en la cancha 4, pero el Drive del torneo guarda una carpeta por TURNO y cancha, y el turno NO se puede deducir del horario: el 05/09 jugamos a las 20:00 y quedamos en TURNO 2; el 12/09, también a las 20:00, quedamos en TURNO 3. Se resuelve a ojo una vez por fecha: basta abrir dos fotos de cada carpeta de cancha 4 y buscar la del verde y blanco. Si una fecha no está acá, el script no baja fotos y el sitio muestra solo la portada con el enlace al álbum.",
+  "por_fecha": {
+    "1": "TURNO 2 CANCHA 4",
+    "2": "TURNO 3 CANCHA 4"
+  }
+}

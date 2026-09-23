@@ -28,7 +28,7 @@ const enlaces = [
   { texto: 'Formación', href: '/', pronto: false },
   { texto: 'Partidos', href: '/partidos', pronto: false },
   { texto: 'Tabla', href: '/tabla', pronto: false },
-  { texto: 'Galería', href: '/galeria', pronto: true },
+  { texto: 'Galería', href: '/galeria', pronto: false },
 ];
 
 const ruta = (Astro.url.pathname.replace(/\/+$/, '') || '/');
@@ -232,6 +232,19 @@ const esActivo = (href: string) => ruta === href;
     height: 2px;
     background: var(--crema);
     border-radius: 2px;
+    transition: transform 0.22s ease, opacity 0.22s ease;
+  }
+
+  /* Con el menú abierto el ícono pasa a X. Es la señal de siempre, no un adorno:
+     dice que el mismo botón ahora cierra. Las barras están a 7px entre centros
+     (2px de barra + 5px de separación), así que se juntan con un desplazamiento
+     de 7px antes de girar. */
+  .navbar:has(.navbar__menu:popover-open) .navbar__burger span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .navbar:has(.navbar__menu:popover-open) .navbar__burger span:nth-child(2) { opacity: 0; }
+  .navbar:has(.navbar__menu:popover-open) .navbar__burger span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
   }
 
   .navbar__menu {
@@ -245,9 +258,50 @@ const esActivo = (href: string) => ruta === href;
     padding: 10px 24px 20px;
     background: rgb(4 22 13 / 0.97);
     border-bottom: 1px solid rgb(195 147 80 / 0.3);
+
+    /* Abrir y cerrar: entra deslizándose desde arriba mientras aparece. La
+       animación necesita `allow-discrete` en `display` y en `overlay`, porque son
+       propiedades discretas: sin eso el navegador saca el popover de la capa
+       superior en el mismo cuadro y no queda nada que animar. */
+    opacity: 0;
+    transform: translateY(-12px);
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s cubic-bezier(0.22, 0.85, 0.24, 1),
+      display 0.22s allow-discrete,
+      overlay 0.22s allow-discrete;
   }
+
+  .navbar__menu:popover-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* desde dónde arranca al abrir */
+  @starting-style {
+    .navbar__menu:popover-open {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+  }
+
   .navbar__menu:not(:popover-open) { display: none; }
-  .navbar__menu::backdrop { background: rgb(3 17 10 / 0.6); }
+
+  /* el velo, con la misma duración que el menú para que vayan juntos */
+  .navbar__menu::backdrop {
+    background: rgb(3 17 10 / 0.6);
+    opacity: 1;
+    transition:
+      opacity 0.22s ease,
+      display 0.22s allow-discrete,
+      overlay 0.22s allow-discrete;
+  }
+
+  .navbar__menu:not(:popover-open)::backdrop { opacity: 0; }
+
+  @starting-style {
+    .navbar__menu:popover-open::backdrop { opacity: 0; }
+  }
 
   .navbar__menu nav {
     display: flex;
@@ -329,6 +383,31 @@ const esActivo = (href: string) => ruta === href;
     });
   }
 
+  /**
+   * Cierra el menú móvil.
+   *
+   * Hace falta porque el navbar se reutiliza entre páginas (transition:persist):
+   * el popover es hijo del header, así que al cambiar de sección quedaba ABIERTO
+   * sobre la página nueva. Se cierra al hacer clic en un enlace, y no solo al
+   * llegar, porque la transición de Astro fotografía la página que se va: con el
+   * menú abierto, aparecería en el fade.
+   */
+  function cerrarMenu() {
+    const menu = document.getElementById('menu-movil');
+    if (menu && menu.matches(':popover-open')) menu.hidePopover();
+  }
+
+  /** Se enlaza una sola vez, porque el popover también persiste. */
+  function enlazarMenu() {
+    const menu = document.getElementById('menu-movil');
+    if (!menu || menu.dataset.enlazado) return;
+    menu.dataset.enlazado = '1';
+    menu.addEventListener('click', (ev) => {
+      const destino = ev.target instanceof Element ? ev.target.closest('a[href]') : null;
+      if (destino) menu.hidePopover();
+    });
+  }
+
   function iniciarNavbar() {
     // En un cambio de página, sin animaciones: el estado final se aplica de una.
     // Si no, el nombre se desliza y el fondo se desvanece mientras la página hace
@@ -338,6 +417,8 @@ const esActivo = (href: string) => ruta === href;
 
     revisarScroll();
     marcarActivo();
+    enlazarMenu();
+    cerrarMenu();
 
     if (nav) {
       // dos cuadros: uno para que el navegador registre el estado nuevo, otro

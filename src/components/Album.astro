@@ -1,0 +1,592 @@
+---
+/**
+ * Un álbum: las fotos de un partido nuestro.
+ *
+ * Lleva encabezado con la fecha, el rival y el resultado. Una galería sin ese
+ * contexto son fotos sueltas; el resultado es lo que las une.
+ *
+ * ⚠️ Las fotos son de la fotografía oficial de la liga. Acá se muestra una
+ * selección y se enlaza al álbum completo en Drive, que es donde están en
+ * grande y donde está el resto (~40 por partido). El crédito va al pie de la
+ * página.
+ */
+import { Image, getImage } from 'astro:assets';
+import type { Album } from '../lib/galeria';
+
+interface Props {
+  album: Album;
+  rival: string;
+  marcador: string;
+  cuando: string;
+  /** 'Ganado' / 'Empate' / 'Perdido', o null si el dato no alcanza para afirmarlo. */
+  rotulo: string | null;
+}
+
+const { album, rival, marcador, cuando, rotulo } = Astro.props;
+
+// La versión grande para el visor: 1400px en WebP. Se genera en el build, pero
+// NO se descarga hasta que alguien abre una foto: el enlace guarda la dirección
+// y el visor se la copia al abrir. Mirar la galería sin abrir nada no cuesta nada.
+const grandes = await Promise.all(
+  album.fotos.map((f) => getImage({ src: f, width: 1600, format: 'webp', quality: 74 })),
+);
+const medianas = await Promise.all(
+  album.fotos.map((f) => getImage({ src: f, width: 1000, format: 'webp', quality: 74 })),
+);
+---
+
+<section class="album">
+  <header class="album__cabecera">
+    <h3 class="album__titulo">Fecha {album.fecha}</h3>
+    <p class="album__marcador">
+      Real Betits {marcador} {rival}
+      {rotulo && <span class:list={['album__rotulo', `album__rotulo--${rotulo.toLowerCase()}`]}>{rotulo}</span>}
+    </p>
+    <p class="album__cuando">{cuando}</p>
+  </header>
+
+  {
+    album.fotos.length > 0 ? (
+      <div class="album__grilla">
+        {album.fotos.map((f, i) => (
+          <button
+            class="album__abrir"
+            type="button"
+            data-grande={grandes[i].src}
+            data-grande-medio={medianas[i].src}
+            aria-label={`Ver en grande la foto ${i + 1} de ${album.fotos.length}`}
+          >
+            <Image
+              src={f}
+              alt={`Foto ${i + 1} del partido contra ${rival}`}
+              widths={[320, 640]}
+              sizes="(max-width: 560px) 45vw, 300px"
+              loading={i < 4 ? 'eager' : 'lazy'}
+            />
+          </button>
+        ))}
+      </div>
+    ) : (
+      /* Sin fotos bajadas todavía: se dice, no se disimula con un hueco. */
+      <p class="album__vacio">
+        Todavía no bajamos las fotos de esta fecha. Están todas en el álbum.
+      </p>
+    )
+  }
+
+  {
+    album.album && (
+      <a class="album__enlace" href={album.album} target="_blank" rel="noopener noreferrer">
+        Ver el álbum completo en Drive
+        {album.total ? ` · ${album.total} fotos` : ''}
+      </a>
+    )
+  }
+
+  {
+    album.fotos.length > 0 && (
+      <dialog class="visor" aria-label={`Fotos de la Fecha ${album.fecha} contra ${rival}`}>
+        <figure class="visor__caja">
+          <img class="visor__foto" alt="" />
+        </figure>
+        <p class="visor__pie">
+          <span class="visor__cuenta">1</span> / {album.fotos.length}
+          <span class="visor__contexto">Fecha {album.fecha} · vs {rival}</span>
+        </p>
+        <button class="visor__flecha visor__flecha--izq" type="button" aria-label="Foto anterior">‹</button>
+        <button class="visor__flecha visor__flecha--der" type="button" aria-label="Foto siguiente">›</button>
+        <button class="visor__cerrar" type="button" aria-label="Cerrar">×</button>
+      </dialog>
+    )
+  }
+</section>
+
+<script>
+  /**
+   * Visor de fotos.
+   *
+   * Se engancha UNA sola vez en `document`, con delegación de eventos: las fotos
+   * y los visores son elementos nuevos en cada navegación (el sitio usa View
+   * Transitions), así que escuchar a cada elemento obligaría a reconectar en cada
+   * `astro:page-load`.
+   */
+  const declarar = () => {
+    if (window.__visorListo) return;
+    window.__visorListo = true;
+
+    const estados = new WeakMap();
+
+    const pintar = (visor) => {
+      const e = estados.get(visor);
+      if (!e) return;
+      const origen = e.botones[e.i];
+      const img = visor.querySelector('.visor__foto');
+      // srcset: en el teléfono se baja la de 1000 y en escritorio la de 1600
+      img.srcset = `${origen.dataset.grandeMedio} 1000w, ${origen.dataset.grande} 1600w`;
+      img.sizes = '(max-width: 900px) 94vw, 78vw';
+      img.src = origen.dataset.grande ?? '';
+      img.alt = origen.querySelector('img')?.alt ?? '';
+      const cuenta = visor.querySelector('.visor__cuenta');
+      if (cuenta) cuenta.textContent = String(e.i + 1);
+    };
+
+    const mover = (visor, paso) => {
+      const e = estados.get(visor);
+      if (!e) return;
+      // circular: desde la última se vuelve a la primera
+      e.i = (e.i + paso + e.botones.length) % e.botones.length;
+      pintar(visor);
+    };
+
+    // Sin animación para quien pidió menos movimiento en el sistema.
+    const sinMovimiento = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /**
+     * Vuela la foto desde/hacia su miniatura. Es lo que hace que "agrandar" se
+     * sienta como que la miniatura crece hasta su lugar, en vez de aparecer de golpe.
+     *
+     * La función recibe los DOS elementos y mide adentro. Antes recibía los
+     * rectángulos ya medidos, y al cerrar se los pasé al revés: en vez de encoger
+     * 0,32x la animación agrandaba 3,1x (un mega zoom de un segundo antes de
+     * cerrarse). Con los elementos no hay orden posible que invertir.
+     *
+     * El estado "lejos" es siempre: del tamaño y en el lugar de la miniatura, o sea
+     * escala = ancho_miniatura / ancho_foto, y el centro corrido de una a la otra.
+     */
+    const volar = (foto, miniatura, volviendo) => {
+      const enMiniatura = miniatura.getBoundingClientRect();
+      const enFoto = foto.getBoundingClientRect();
+      const dx = enMiniatura.left + enMiniatura.width / 2 - (enFoto.left + enFoto.width / 2);
+      const dy = enMiniatura.top + enMiniatura.height / 2 - (enFoto.top + enFoto.height / 2);
+      const escala = enFoto.width ? enMiniatura.width / enFoto.width : 1;
+      const lejos = `translate(${dx}px, ${dy}px) scale(${escala})`;
+      // Sin opacity a propósito: si la foto se transparenta aparece por debajo la
+      // miniatura real de la grilla y se ven las dos copias (una en movimiento y
+      // otra quieta, apenas distintas). Opaca, la foto tapa la miniatura y aterriza
+      // justo encima, así que el cambio no se nota.
+      return foto.animate(
+        volviendo
+          ? [{ transform: 'none' }, { transform: lejos }]
+          : [{ transform: lejos }, { transform: 'none' }],
+        // `fill: 'forwards'` es imprescindible al cerrar: sin él, al terminar la
+        // animación el navegador le quita el efecto y la foto vuelve de golpe a su
+        // tamaño grande durante el fundido del visor. Ese era el parpadeo.
+        { duration: 300, easing: 'cubic-bezier(.22,.85,.24,1)', fill: 'forwards' },
+      );
+    };
+
+    /** Cerrar tocando el fondo, la X, las flechas o Esc, pero encogiendo la foto. */
+    const cerrarVisor = (visor) => {
+      const e = estados.get(visor);
+      const foto = visor.querySelector('.visor__foto');
+      // En el teléfono hay UNA sola miniatura visible. Si la foto que se está
+      // viendo está oculta (display: none), su rectángulo mide 0 y la animación
+      // encogería hacia la nada: en ese caso el avión cae sobre la portada, que es
+      // la foto desde la que salió el usuario.
+      let miniatura = e ? e.botones[e.i]?.querySelector('img') : null;
+      if (miniatura && !miniatura.getBoundingClientRect().width) {
+        miniatura = e?.botones[0]?.querySelector('img') ?? null;
+      }
+      // el velo empieza a difuminarse YA, junto con la foto. El diálogo se cierra
+      // recién cuando la foto llega a la miniatura, 300 ms más tarde.
+      visor.classList.remove('visor--visible');
+      if (sinMovimiento() || !miniatura || !foto?.complete || !foto.naturalWidth) {
+        visor.close();
+        return;
+      }
+      // la animación de la apertura puede seguir viva: se cancela y arranca la del
+      // cierre en el mismo cuadro, así que no se ve el corte
+      e?.anim?.cancel();
+      const a = volar(foto, miniatura, true);
+      if (e) e.anim = a;
+      a.addEventListener('finish', () => visor.close());
+      // si algo corta la animación, que igual se cierre
+      a.addEventListener('cancel', () => visor.close());
+    };
+
+    /**
+     * Pasar de foto con el dedo.
+     *
+     * En el teléfono el visor muestra una sola foto grande, así que el gesto
+     * natural para "scrollear fotos" es deslizar. Se exige un mínimo de recorrido
+     * para no confundir un toque con un deslizamiento, y si el movimiento es más
+     * vertical que horizontal se ignora: eso no es pasar de foto.
+     */
+    const UMBRAL_DEDO = 45;
+
+    const enlazarDedo = (visor) => {
+      if (visor.dataset.dedo) return;
+      visor.dataset.dedo = '1';
+      let x0 = null;
+      let y0 = null;
+      visor.addEventListener(
+        'touchstart',
+        (ev) => {
+          x0 = ev.touches[0].clientX;
+          y0 = ev.touches[0].clientY;
+        },
+        { passive: true },
+      );
+      visor.addEventListener(
+        'touchend',
+        (ev) => {
+          if (x0 === null) return;
+          const dx = ev.changedTouches[0].clientX - x0;
+          const dy = ev.changedTouches[0].clientY - y0;
+          x0 = null;
+          if (Math.abs(dx) < UMBRAL_DEDO || Math.abs(dx) < Math.abs(dy)) return;
+          mover(visor, dx < 0 ? 1 : -1);
+        },
+        { passive: true },
+      );
+    };
+
+    document.addEventListener('click', (ev) => {
+      const t = ev.target;
+      if (!t?.closest) return;
+
+      const abrir = t.closest('.album__abrir');
+      if (abrir) {
+        const album = abrir.closest('.album');
+        const visor = album?.querySelector('dialog.visor');
+        if (!visor) return;
+        // OJO: las miniaturas son <button> y NO <a> a propósito. Astro intercepta
+        // los clics de los <a> internos en la fase de CAPTURA, así que un
+        // preventDefault en la fase de burbuja llega tarde: el router navegaba
+        // igual, se llevaba el visor por delante y el usuario terminaba viendo la
+        // foto cruda. Con <button> el router ni se entera.
+        const botones = [...album.querySelectorAll('.album__abrir')];
+        estados.set(visor, { botones, i: botones.indexOf(abrir), anim: null });
+        pintar(visor);
+        visor.showModal();
+        // el velo entra un cuadro después de aparecer el diálogo: si la clase se
+        // pusiera en el mismo cuadro, la transición no llegaría a correr
+        requestAnimationFrame(() => visor.classList.add('visor--visible'));
+        // Esc: se intercepta para que también encoja en vez de desaparecer de golpe.
+        // El evento `cancel` no burbujea, así que va por visor y una sola vez.
+        enlazarDedo(visor);
+        if (!visor.dataset.conAnimacion) {
+          visor.dataset.conAnimacion = '1';
+          visor.addEventListener('cancel', (ev) => {
+            ev.preventDefault();
+            cerrarVisor(visor);
+          });
+        }
+        if (!sinMovimiento()) {
+          const foto = visor.querySelector('.visor__foto');
+          const miniatura = abrir.querySelector('img');
+          // sin esperar a que la foto esté decodificada mediríamos 0x0 y la
+          // animación saldría de un punto.
+          foto
+            ?.decode()
+            .catch(() => {})
+            .then(() => {
+              if (!miniatura || !foto) return;
+              // la animación del cierre anterior sigue aplicada (`fill: forwards`);
+              // cancelarla y arrancar la nueva en el mismo cuadro no se ve.
+              estados.get(visor)?.anim?.cancel();
+              const e = estados.get(visor);
+              if (e) e.anim = volar(foto, miniatura, false);
+            });
+        }
+        return;
+      }
+
+      const flecha = t.closest('.visor__flecha');
+      if (flecha) {
+        const visor = flecha.closest('dialog');
+        if (visor) mover(visor, flecha.classList.contains('visor__flecha--der') ? 1 : -1);
+        return;
+      }
+
+      const cerrar = t.closest('.visor__cerrar');
+      if (cerrar) {
+        const visor = cerrar.closest('dialog');
+        if (visor) cerrarVisor(visor);
+        return;
+      }
+
+      // clic en el fondo oscuro, fuera de la foto
+      if (t.matches('dialog.visor')) cerrarVisor(t);
+    });
+
+    // ← → para pasar de foto. No lo pidió el usuario, pero es gratis y evita que
+    // el visor sea inmanejable con teclado.
+    document.addEventListener('keydown', (ev) => {
+      const visor = document.querySelector('dialog.visor[open]');
+      if (!visor) return;
+      if (ev.key === 'ArrowLeft') mover(visor, -1);
+      else if (ev.key === 'ArrowRight') mover(visor, 1);
+    });
+  };
+
+  declarar();
+  document.addEventListener('astro:page-load', declarar);
+</script>
+
+<style>
+  .album { margin-top: 46px; }
+
+  .album__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 16px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgb(195 147 80 / 0.22);
+  }
+
+  /* la tipografía display, la misma de las tablas: es la voz del sitio */
+  .album__titulo {
+    margin: 0;
+    font-family: var(--fuente-display);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dorado);
+  }
+
+  .album__marcador {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0;
+    font-family: var(--fuente-display);
+    font-size: 20px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--blanco);
+  }
+
+  .album__rotulo {
+    font-family: var(--fuente-texto);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(229 225 222 / 0.5);
+  }
+
+  .album__rotulo--ganado { color: var(--verde-brillo); }
+  .album__rotulo--perdido { color: #c0554f; }
+
+  .album__cuando {
+    margin: 0;
+    margin-left: auto;
+    font-size: 12.5px;
+    color: rgb(229 225 222 / 0.5);
+  }
+
+  .album__grilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 10px;
+  }
+
+  .album__abrir {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    text-align: inherit;
+    overflow: hidden;
+    border-radius: var(--radio-chico);
+    background: rgb(10 42 26 / 0.5);
+  }
+
+  .album__abrir img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* todas al mismo alto: la grilla queda pareja y las fotos no bailan */
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    transition: opacity 0.22s ease;
+  }
+
+  .album__abrir:hover img { opacity: 0.82; }
+
+  .album__vacio {
+    margin: 0;
+    font-size: 14px;
+    color: rgb(229 225 222 / 0.55);
+  }
+
+  .album__enlace {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 18px;
+    border: 1px solid rgb(195 147 80 / 0.4);
+    border-radius: 999px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dorado-claro);
+    text-decoration: none;
+    transition: background 0.22s ease, border-color 0.22s ease;
+  }
+
+  .album__enlace:hover {
+    background: rgb(195 147 80 / 0.12);
+    border-color: rgb(195 147 80 / 0.7);
+  }
+
+  /* --- el visor ------------------------------------------------------------ */
+
+  .visor {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: hidden;
+    /* El visor entra y sale fundiéndose. `allow-discrete` es la pieza que deja
+       animar el cambio de `display`, que sin eso es instantáneo y el fundido de
+       salida nunca se vería. Se apoya en el navegador: si no lo soporta, el visor
+       abre y cierra sin transición, que es exactamente como funcionaba antes. */
+    opacity: 1;
+    transition: opacity 0.26s ease, overlay 0.26s allow-discrete, display 0.26s allow-discrete;
+  }
+
+  .visor:not([open]) { opacity: 0; }
+
+  @starting-style {
+    .visor[open] { opacity: 0; }
+  }
+
+  /* El velo: oscurece la página de atrás sin dejar de ser el sitio.
+     La opacidad la maneja una CLASE y no el atributo `[open]`, a propósito: el
+     diálogo se cierra 300 ms después de que la foto terminó de achicarse, así que
+     atado a `[open]` el velo se quedaba a pleno durante todo el encogimiento y
+     recién ahí desaparecía de golpe. Con la clase arranca a difuminarse junto con
+     la foto. */
+  .visor::backdrop {
+    /* misma duración y misma curva que la animación de la foto, para que se
+       difuminen a la par y no uno con `ease` y el otro con otra cosa */
+    background: rgb(3 15 9 / 0.94);
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(.22, .85, .24, 1);
+  }
+
+  .visor.visor--visible::backdrop { opacity: 1; }
+
+  .visor__caja {
+    display: grid;
+    place-items: center;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    padding: 46px 86px 68px;
+  }
+
+  .visor__foto {
+    max-width: 100%;
+    max-height: 100%;
+    /* que el deslizamiento con el dedo no arrastre la imagen ni la seleccione */
+    user-select: none;
+    -webkit-user-drag: none;
+    /* que la foto no se deforme nunca: se ajusta sin recortar */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: var(--radio-chico);
+    background: rgb(10 42 26 / 0.6);
+  }
+
+  .visor__pie {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 18px;
+    margin: 0;
+    text-align: center;
+    font-family: var(--fuente-display);
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dorado-claro);
+  }
+
+  .visor__contexto {
+    margin-left: 10px;
+    font-family: var(--fuente-texto);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    color: rgb(229 225 222 / 0.5);
+  }
+
+  .visor__flecha,
+  .visor__cerrar {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(195 147 80 / 0.45);
+    border-radius: 50%;
+    background: rgb(5 25 15 / 0.8);
+    color: var(--dorado-claro);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .visor__flecha:hover,
+  .visor__cerrar:hover {
+    background: rgb(195 147 80 / 0.2);
+    border-color: rgb(195 147 80 / 0.85);
+  }
+
+  .visor__flecha {
+    top: 50%;
+    translate: 0 -50%;
+    width: 54px;
+    height: 54px;
+    font-size: 30px;
+    line-height: 1;
+    padding-bottom: 4px;
+  }
+
+  .visor__flecha--izq { left: 16px; }
+  .visor__flecha--der { right: 16px; }
+
+  .visor__cerrar {
+    top: 12px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  @media (max-width: 560px) {
+    .album__cuando { margin-left: 0; }
+
+    /* El álbum en el teléfono: UNA foto grande, tipo publicación. Antes eran 12
+       miniaturas de 140px, donde no se distinguía nada. Se toca y se abre el
+       visor, que es donde se pasa de foto en foto.
+       Las otras 11 siguen en el DOM, ocultas: el visor las recorre igual, así que
+       no hay que duplicar los datos ni el recorrido. */
+    .album__grilla { grid-template-columns: 1fr; gap: 0; }
+    .album__abrir { display: none; }
+    .album__abrir:first-child { display: block; }
+
+    /* en el teléfono: una sola foto grande, y las flechas al alcance del pulgar */
+    .visor__caja { padding: 54px 10px 84px; }
+    .visor__flecha {
+      top: auto;
+      bottom: 14px;
+      translate: none;
+      width: 54px;
+      height: 54px;
+      font-size: 28px;
+    }
+    .visor__flecha--izq { left: 16px; }
+    .visor__flecha--der { right: 16px; }
+    .visor__pie { bottom: 34px; }
+  }
+</style>

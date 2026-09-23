@@ -11,9 +11,10 @@ Endpoints usados (todos públicos, sin login):
   - https://copafacil-web.firebaseio.com/events/<evt>/matchs.json  -> todos los partidos
   - https://copafacil-web.firebaseio.com/events/<evt>/midia.json   -> galería/noticias
   - https://copafacil-storage.b-cdn.net/events%2F<evt>%2F<div>%2Fteams%2F<id>.png
+  - https://drive.google.com/embeddedfolderview?id=<carpeta>       -> listado de un álbum
 
 Uso:   python3 scripts/extraer-liga.py
-Salida: data/liga.json  +  data/logos/
+Salida: data/liga.json  +  data/logos/  +  data/galeria/
 
 RED DE SEGURIDAD: si la descarga falla o los datos nuevos salen incoherentes, el script
 sale con código != 0 y **NO toca** el liga.json existente. Así el sitio (y el Action)
@@ -40,6 +41,22 @@ DATA = os.path.join(REPO, "data")
 OUT = os.path.join(DATA, "liga.json")
 LOGO_DIR = os.path.join(DATA, "logos")
 GAL_DIR = os.path.join(DATA, "galeria")
+
+# --- Galería: el Drive del torneo -------------------------------------------
+# Los álbumes son carpetas públicas de Drive y se pueden LISTAR sin login con
+# `embeddedfolderview`. Adentro vienen: 3ER TIEMPO / EQUIPOS / TURNO <n> CANCHA <m>.
+# Se juega siempre en la cancha 4, así que las fotos de nuestro partido están en
+# una carpeta "TURNO n CANCHA 4" — cuál turno, lo dice data/galeria-carpetas.json.
+DRIVE_LISTA = "https://drive.google.com/embeddedfolderview?id={}#list"
+DRIVE_FOTO = "https://drive.google.com/thumbnail?id={}&sz=w1600"
+UA = "Mozilla/5.0 (X11; Linux x86_64)"
+# Cuántas fotos se bajan por jornada, y de qué ancho. El álbum entero tiene ~40
+# y el resto se ve en Drive. Se piden a 1600px: la miniatura de la grilla se
+# genera de ahí, y alcanza para que el visor a pantalla completa no agrande nada
+# en un monitor normal. (Con 1000px el visor quedaba pixeleado: medido, Drive
+# devuelve 1000 = 218 kB, 1600 = 479 kB, y el original pasa de 3840.)
+FOTOS_POR_FECHA = 12
+GAL_MAPA = os.path.join(DATA, "galeria-carpetas.json")
 
 # IDs internos de equipo -> nombre (confirmado cruzando GF/GA/Pts con la tabla de la app)
 MAPPING = {
@@ -210,6 +227,98 @@ def descargar_galeria(gallery):
     return bajadas
 
 
+def curl_texto(url, intentos=2):
+    """Baja texto con reintentos. None si no lo logra."""
+    for i in range(intentos):
+        r = subprocess.run(["curl", "-sS", "-L", "-m", "30", "-A", UA, url],
+                           capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout:
+            return r.stdout
+        if i < intentos - 1:
+            time.sleep(2 * (i + 1))
+    return None
+
+
+def listar_drive(carpeta):
+    """Entradas de una carpeta pública de Drive: [(id, nombre)]. [] si no se pudo.
+
+    `embeddedfolderview` es el listado sin login de Drive. Devuelve HTML con un
+    bloque por entrada; de ahí salen el id (para pedir la foto) y el nombre.
+    """
+    h = curl_texto(DRIVE_LISTA.format(carpeta))
+    if not h:
+        return []
+    return re.findall(r'<div class="flip-entry"[^>]*id="entry-([-\w]+)"[^>]*>.*?'
+                      r'<div class="flip-entry-title">([^<]*)</div>', h, re.S)
+
+
+def id_de_album(url):
+    """El id de la carpeta a partir del link que publica la app: .../folders/<id>?..."""
+    m = re.search(r"/folders/([-\w]+)", url or "")
+    return m.group(1) if m else None
+
+
+def leer_mapa_carpetas():
+    """{fecha: 'TURNO n CANCHA 4'} desde data/galeria-carpetas.json (mantenido a mano)."""
+    try:
+        with open(GAL_MAPA) as f:
+            return json.load(f).get("por_fecha", {})
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def descargar_fotos_jornada(n, album, turno):
+    """Baja FOTOS_POR_FECHA fotos de NUESTRA carpeta (cancha 4) de esa jornada.
+
+    Se toman REPARTIDAS a lo largo de la carpeta y no las primeras: al principio
+    suelen ir las fotos de equipo y el calentamiento, y el partido queda al final.
+    Con 41 fotos y 12 pedidas, esto toma una de cada tres.
+
+    Devuelve (cuántas bajó, cuántas hay en la carpeta). El total sirve para el
+    botón "ver el álbum completo"; es None si no se pudo listar.
+    """
+    album_id = id_de_album(album)
+    if not album_id:
+        return 0, None
+
+    def norm(s):
+        return re.sub(r"\s+", "", s).upper()
+
+    sub = listar_drive(album_id)
+    cid = next((i for i, nombre in sub if norm(nombre) == norm(turno)), None)
+    if not cid:
+        print(f"  aviso: en el álbum de la fecha {n} no encontré la carpeta '{turno}'",
+              file=sys.stderr)
+        return 0, None
+
+    archivos = [i for i, nombre in listar_drive(cid)
+                if nombre.lower().endswith((".jpg", ".jpeg", ".png"))]
+    if not archivos:
+        print(f"  aviso: la carpeta '{turno}' de la fecha {n} no tiene fotos", file=sys.stderr)
+        return 0, None
+
+    destino = os.path.join(GAL_DIR, f"fecha-{n}")
+    os.makedirs(destino, exist_ok=True)
+    paso = max(1, len(archivos) // FOTOS_POR_FECHA)
+    # Se saltea el arranque: las primeras de la carpeta son las fotos de equipo
+    # (una de cada cuadro) y el calentamiento, no el partido.
+    elegidas = archivos[2::paso][:FOTOS_POR_FECHA]
+
+    bajadas = 0
+    for k, fid in enumerate(elegidas, 1):
+        dest = os.path.join(destino, f"{k:02d}.jpg")
+        if os.path.exists(dest) and os.path.getsize(dest) > 0:
+            continue   # ya la tenemos: no re-descargar (evita diffs inútiles)
+        r = subprocess.run(["curl", "-sS", "-L", "-m", "40", "-o", dest,
+                            "-w", "%{http_code}", DRIVE_FOTO.format(fid)],
+                           capture_output=True, text=True)
+        if r.stdout.strip() == "200" and os.path.exists(dest) and os.path.getsize(dest) > 0:
+            bajadas += 1
+        elif os.path.exists(dest):
+            os.remove(dest)   # no dejar un archivo vacío o a medio bajar
+    return bajadas, len(archivos)
+
+
 def main():
     os.makedirs(DATA, exist_ok=True)
 
@@ -270,6 +379,25 @@ def main():
     nuevos_logos = descargar_logos()
     nuevas_fotos = descargar_galeria(gallery)
 
+    # --- fotos de cada jornada, desde el Drive del torneo ---
+    # Solo para los álbumes de nuestra división y con turno resuelto en el mapa.
+    # Si el Drive falla, se avisa y se sigue: el dato de la liga importa más, y
+    # el sitio sabe mostrar solo la portada con el enlace al álbum.
+    mapa = leer_mapa_carpetas()
+    fotos_jornada = 0
+    for g in gallery:
+        if not g.get("es_mi_division"):
+            continue
+        n = fecha_de_titulo(g.get("titulo"))
+        if n is None:
+            continue
+        g["carpeta"] = mapa.get(str(n))
+        if not g["carpeta"]:
+            continue
+        bajadas, total = descargar_fotos_jornada(n, g.get("album"), g["carpeta"])
+        g["fotos_en_nuestra_carpeta"] = total
+        fotos_jornada += bajadas
+
     # Sin timestamp a propósito: así el archivo solo cambia cuando cambian los DATOS,
     # y el Action no hace un commit diario vacío. La fecha queda en el historial de git.
     dataset = {
@@ -297,6 +425,8 @@ def main():
           + (f" (nuevos: {', '.join(nuevos_logos)})" if nuevos_logos else ""))
     print(f"  fotos de galería: {len(os.listdir(GAL_DIR))} archivos"
           + (f" (nuevas: {', '.join(nuevas_fotos)})" if nuevas_fotos else ""))
+    if fotos_jornada:
+        print(f"  fotos de partido bajadas del Drive: {fotos_jornada}")
 
 
 if __name__ == "__main__":

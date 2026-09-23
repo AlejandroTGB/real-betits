@@ -12,6 +12,13 @@
  * posiciones — por eso las dos se ven iguales sin copiar estilos.
  */
 import { GOLEADORES, GOLES_TOTAL, etiquetaPosicion } from '../lib/plantilla';
+
+/**
+ * El que más goles tiene. Se compara contra el NÚMERO y no contra la posición en
+ * la lista: si algún día hay empate en la punta, así se destacan los dos y la
+ * tabla no elige a uno por el orden alfabético del desempate.
+ */
+const MAXIMO = Math.max(...GOLEADORES.map((j) => j.goles));
 ---
 
 <div class="tabla-envoltura">
@@ -26,7 +33,7 @@ import { GOLEADORES, GOLES_TOTAL, etiquetaPosicion } from '../lib/plantilla';
     <tbody>
       {
         GOLEADORES.map((j) => (
-          <tr class="tabla__fila">
+          <tr class:list={['tabla__fila', j.goles === MAXIMO && 'gol__maximo']}>
             <td class="tabla__eq">{j.nombre}</td>
             <td class="tabla__c">
               <span class="gol__pos">{etiquetaPosicion(j.posicion)}</span>
@@ -51,6 +58,24 @@ import { GOLEADORES, GOLES_TOTAL, etiquetaPosicion } from '../lib/plantilla';
     letter-spacing: 0.1em;
     color: rgb(229 225 222 / 0.5);
   }
+
+  /* El goleador: mismo dorado que usa nuestra fila en la tabla de posiciones, para
+     que el sitio hable un solo idioma visual. Fondo dorado tenue, nombre y número
+     en dorado, y el número más grande. */
+  .gol__maximo td {
+    background: rgb(195 147 80 / 0.15);
+    border-bottom-color: rgb(195 147 80 / 0.32);
+  }
+
+  .gol__maximo .tabla__eq,
+  .gol__maximo td.tabla__num {
+    color: var(--dorado-claro);
+    font-weight: 700;
+  }
+
+  .gol__maximo td.tabla__num { font-size: 22px; }
+
+  .gol__maximo .gol__pos { color: rgb(227 189 130 / 0.75); }
 
   /* el total, callado: cierra la tabla sin competir con los goleadores */
   .gol__total td {
