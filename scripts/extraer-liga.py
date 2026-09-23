@@ -21,6 +21,7 @@ se quedan con el último dato bueno en vez de publicar basura.
 """
 import json
 import os
+import re
 import sys
 import time
 import collections
@@ -38,6 +39,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(REPO, "data")
 OUT = os.path.join(DATA, "liga.json")
 LOGO_DIR = os.path.join(DATA, "logos")
+GAL_DIR = os.path.join(DATA, "galeria")
 
 # IDs internos de equipo -> nombre (confirmado cruzando GF/GA/Pts con la tabla de la app)
 MAPPING = {
@@ -173,6 +175,41 @@ def descargar_logos():
     return bajar
 
 
+def fecha_de_titulo(titulo):
+    """'Fotos Fecha 1 ⚽️🔥2da Div 05/09' -> 1.  None si no se puede leer."""
+    m = re.search(r"fecha\s*(\d+)", (titulo or "").lower())
+    return int(m.group(1)) if m else None
+
+
+def descargar_galeria(gallery):
+    """Baja las portadas de los álbumes de NUESTRA división a data/galeria/.
+
+    Nombre determinista (fecha-1.jpg) para que el sitio las resuelva por número
+    de fecha, igual que los escudos se resuelven por nombre de equipo.
+
+    Solo la de nuestra división: las demás galerías son de otras categorías y no
+    nos representan. Si un álbum no se puede asociar a una fecha, se saltea.
+    """
+    os.makedirs(GAL_DIR, exist_ok=True)
+    bajadas = []
+    for g in gallery:
+        if not g.get("es_mi_division") or not g.get("foto"):
+            continue
+        n = fecha_de_titulo(g.get("titulo"))
+        if n is None:
+            continue
+        dest = os.path.join(GAL_DIR, f"fecha-{n}.jpg")
+        if os.path.exists(dest) and os.path.getsize(dest) > 0:
+            continue   # ya la tenemos: no re-descargar (evita diffs inútiles)
+        r = subprocess.run(["curl", "-s", "-L", "-m", "30", "-o", dest, "-w", "%{http_code}", g["foto"]],
+                           capture_output=True, text=True)
+        if r.stdout.strip() == "200" and os.path.exists(dest) and os.path.getsize(dest) > 0:
+            bajadas.append(f"fecha-{n}")
+        elif os.path.exists(dest):
+            os.remove(dest)   # no dejar un archivo vacío o a medio bajar
+    return bajadas
+
+
 def main():
     os.makedirs(DATA, exist_ok=True)
 
@@ -229,8 +266,9 @@ def main():
     if not table or not any(table.values()):
         fail("la tabla de posiciones salió vacía")
 
-    # --- logos ---
+    # --- logos y fotos de la galería ---
     nuevos_logos = descargar_logos()
+    nuevas_fotos = descargar_galeria(gallery)
 
     # Sin timestamp a propósito: así el archivo solo cambia cuando cambian los DATOS,
     # y el Action no hace un commit diario vacío. La fecha queda en el historial de git.
@@ -257,6 +295,8 @@ def main():
             print(f"  REAL BETITS: {mia['pos']}° del grupo {g} ({mia['pts']} pts)")
     print(f"  logos: {len(os.listdir(LOGO_DIR))} archivos"
           + (f" (nuevos: {', '.join(nuevos_logos)})" if nuevos_logos else ""))
+    print(f"  fotos de galería: {len(os.listdir(GAL_DIR))} archivos"
+          + (f" (nuevas: {', '.join(nuevas_fotos)})" if nuevas_fotos else ""))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,327 @@
+---
+/**
+ * Hero: el encabezado grande de la home.
+ *
+ * Todo CSS, sin imágenes de fondo: el resplandor, el bisel del título y las
+ * animaciones de la barra son gradientes. Así no depende de assets que no hay.
+ *
+ * La barra del próximo partido muestra los DOS escudos enfrentados y tiene dos
+ * animaciones: rayas diagonales que derivan lento y un brillo que barre cada
+ * varios segundos. Ambas se apagan si el usuario pidió menos movimiento.
+ */
+import escudo from '../assets/escudo.png';
+import { proximoPartido, fechaLarga, rival, miFila } from '../lib/liga';
+import { escudoDe } from '../lib/escudos';
+
+const proximo = proximoPartido();
+const fila = miFila();
+
+const nombreRival = proximo ? rival(proximo) : null;
+const escudoRival = nombreRival ? escudoDe(nombreRival) : null;
+---
+
+<section class="hero">
+  <div class="hero__brillo" aria-hidden="true"></div>
+
+  <div class="hero__contenido">
+    <img class="hero__escudo" src={escudo.src} alt="Escudo de Real Betits" width="120" height="177" />
+
+    <h1 class="hero__titulo">Real Betits</h1>
+
+    <p class="hero__liga">
+      <span>Zapping Liga Premier</span>
+      <i>·</i><span>Sábado 2° DIV</span>
+      {fila && <i>·</i>}
+      {fila && <span class="hero__grupo">Grupo {fila.grupo}</span>}
+    </p>
+
+    {proximo ? (
+      <div class="barra">
+        <span class="barra__rayas" aria-hidden="true"></span>
+
+        <span class="barra__etiqueta">Próximo partido</span>
+
+        <div class="barra__duelo">
+          <div class="barra__lado">
+            <img class="barra__escudo" src={escudo.src} alt="" width="46" height="68" />
+            <span class="barra__equipo">Real Betits</span>
+          </div>
+
+          <div class="barra__centro">
+            <span class="barra__vs">vs</span>
+            <span class="barra__fecha">{fechaLarga(proximo.fecha)}</span>
+          </div>
+
+          <div class="barra__lado barra__lado--der">
+            {escudoRival ? (
+              <img class="barra__escudo" src={escudoRival} alt="" width="46" height="68" />
+            ) : (
+              <span class="barra__escudo barra__escudo--vacio" aria-hidden="true"></span>
+            )}
+            <span class="barra__equipo">{nombreRival}</span>
+          </div>
+        </div>
+
+        <span class="barra__brillo" aria-hidden="true"></span>
+      </div>
+    ) : (
+      <p class="barra__sin">Torneo terminado por ahora — volvemos la próxima temporada.</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    /* 64vh y no 76vh: con 76 la sección siguiente quedaba justo al borde del
+       pliegue y había que scrollear para ver el título "FORMACIÓN". */
+    min-height: 64vh;
+    display: grid;
+    place-items: center;
+    /* Padding simétrico. Los 46px de abajo existían SOLO para alojar la flecha
+       de "bajar a la formación" (iba a 9px del borde con 34px de alto ≈ 43px);
+       al sacar la flecha quedaban como aire muerto. */
+    padding: 26px 24px;
+    overflow: hidden;
+  }
+
+  .hero__brillo {
+    position: absolute;
+    inset: -30% -10% auto -10%;
+    height: 120%;
+    background:
+      radial-gradient(46% 42% at 50% 34%, rgb(31 122 82 / 0.3), transparent 70%),
+      radial-gradient(30% 26% at 50% 30%, rgb(195 147 80 / 0.13), transparent 72%);
+    pointer-events: none;
+  }
+
+  .hero__contenido {
+    position: relative;
+    width: 100%;
+    /* Ancho del bloque. La barra del partido usa todo este ancho para leerse
+       como "banda" y no como cajita; el título va centrado así que no cambia. */
+    max-width: 1120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero__escudo {
+    height: 118px;
+    width: auto;
+    filter: drop-shadow(0 16px 34px rgb(0 0 0 / 0.7));
+    margin-bottom: 16px;
+  }
+
+  .hero__titulo {
+    font-size: clamp(54px, 12vw, 108px);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    background: linear-gradient(178deg, var(--dorado-claro) 0%, var(--blanco) 42%, #c9c4bf 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 6px 18px rgb(0 0 0 / 0.55));
+  }
+
+  .hero__liga {
+    margin: 12px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(229 225 222 / 0.6);
+  }
+  /* separador: con margen propio para que TODOS queden igual separados.
+     Antes el segundo "·" quedaba pegado a "DIV" porque el salto de línea
+     alrededor de una expresión {} se colapsa. */
+  .hero__liga i {
+    font-style: normal;
+    color: rgb(195 147 80 / 0.6);
+    margin: 0 8px;
+  }
+  .hero__grupo { color: var(--dorado); }
+
+  /* ===================== barra del próximo partido ===================== */
+  .barra {
+    position: relative;
+    width: 100%;
+    margin-top: 34px;
+    padding: 16px 26px 20px;
+    overflow: hidden;
+    /* rectangular, no una cajita: casi todo el ancho y esquinas suaves */
+    border-radius: 12px;
+    border: 1px solid rgb(195 147 80 / 0.3);
+    background: linear-gradient(180deg, rgb(10 42 26 / 0.7), rgb(3 17 10 / 0.78));
+    box-shadow:
+      0 20px 46px rgb(3 17 10 / 0.55),
+      inset 0 1px 0 rgb(195 147 80 / 0.14);
+    isolation: isolate;
+  }
+
+  /* rayas diagonales que derivan despacio: da vida sin distraer */
+  .barra__rayas {
+    position: absolute;
+    inset: -60% -15%;
+    z-index: -1;
+    background: repeating-linear-gradient(
+      116deg,
+      transparent 0 26px,
+      rgb(195 147 80 / 0.055) 26px 52px
+    );
+    animation: deriva 22s linear infinite;
+  }
+  @keyframes deriva {
+    to { transform: translateX(-104px); }
+  }
+
+  .barra__etiqueta {
+    display: block;
+    text-align: center;
+    font-family: var(--fuente-display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--dorado);
+    margin-bottom: 12px;
+  }
+
+  /* los dos equipos enfrentados */
+  .barra__duelo {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .barra__lado {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .barra__lado--der {
+    flex-direction: row-reverse;
+  }
+
+  .barra__escudo {
+    height: 46px;
+    width: auto;
+    flex: none;
+    filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.55));
+  }
+  /* hueco del mismo tamaño cuando el rival no tiene escudo subido */
+  .barra__escudo--vacio {
+    display: block;
+    width: 34px;
+    height: 46px;
+    border-radius: 5px;
+    border: 1px dashed rgb(195 147 80 / 0.3);
+  }
+
+  .barra__equipo {
+    font-family: var(--fuente-display);
+    font-size: clamp(18px, 3vw, 27px);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--blanco);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .barra__centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0 16px;
+  }
+
+  .barra__vs {
+    font-family: var(--fuente-display);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dorado-claro);
+    animation: latido-vs 3.4s ease-in-out infinite;
+  }
+  @keyframes latido-vs {
+    0%, 100% { opacity: 0.72; text-shadow: 0 0 0 rgb(195 147 80 / 0); }
+    50% { opacity: 1; text-shadow: 0 0 14px rgb(195 147 80 / 0.55); }
+  }
+
+  .barra__fecha {
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    color: rgb(229 225 222 / 0.7);
+    white-space: nowrap;
+  }
+
+  /* brillo que barre de punta a punta cada varios segundos */
+  .barra__brillo {
+    position: absolute;
+    top: -60%;
+    left: -35%;
+    width: 26%;
+    height: 220%;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(14deg);
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.05) 35%,
+      rgb(255 255 255 / 0.22) 50%,
+      rgb(255 255 255 / 0.05) 65%,
+      transparent 100%
+    );
+    animation: barrido 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  @keyframes barrido {
+    0%   { left: -35%; opacity: 0; }
+    12%  { opacity: 1; }
+    55%  { left: 115%; opacity: 1; }
+    56%, 100% { left: 115%; opacity: 0; }
+  }
+
+  .barra__sin {
+    margin-top: 32px;
+    padding: 20px 26px;
+    border: 1px dashed rgb(195 147 80 / 0.3);
+    border-radius: 12px;
+    color: rgb(229 225 222 / 0.6);
+  }
+
+  /* ---------- celular: la barra se apila ---------- */
+  @media (max-width: 620px) {
+    .barra { padding: 16px 18px 20px; }
+    .barra__duelo {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .barra__lado,
+    .barra__lado--der {
+      flex-direction: row;
+      justify-content: center;
+    }
+    .barra__centro { padding: 2px 0; }
+    .barra__fecha { white-space: normal; }
+  }
+
+  /* respetar a quien pidió menos movimiento */
+  @media (prefers-reduced-motion: reduce) {
+    .barra__rayas,
+    .barra__brillo,
+    .barra__vs { animation: none; }
+  }
+</style>

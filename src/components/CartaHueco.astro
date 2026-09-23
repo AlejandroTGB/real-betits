@@ -1,0 +1,77 @@
+---
+/**
+ * Carta vacía / placeholder: ocupa el lugar de un puesto en la formación
+ * mientras no hay jugador asignado. Misma silueta que la carta real para que
+ * el ojo lea la formación completa.
+ *
+ * El borde discontinuo y la X la distinguen de una carta con datos.
+ */
+interface Props {
+  /** ARQ, DEF, MED, DEL... */
+  posicion: string;
+  /** Nombre corto opcional del puesto, ej: "Lateral derecho" */
+  detalle?: string;
+}
+
+const { posicion, detalle } = Astro.props;
+---
+
+<div class="hueco">
+  <div class="hueco__marco">
+    <span class="hueco__pos">{posicion}</span>
+    <svg class="hueco__x" viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M12 12 L36 36 M36 12 L12 36" />
+    </svg>
+    <span class="hueco__etiqueta">{detalle ?? 'sin asignar'}</span>
+  </div>
+</div>
+
+<style>
+  .hueco {
+    width: 100%;
+  }
+
+  .hueco__marco {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    aspect-ratio: 3 / 4.15;
+    padding: 12px;
+    border-radius: var(--radio);
+    background:
+      linear-gradient(165deg, rgb(10 42 26 / 0.55) 0%, rgb(3 17 10 / 0.7) 100%);
+    border: 1.5px dashed rgb(195 147 80 / 0.55);
+    box-shadow: inset 0 0 30px rgb(0 0 0 / 0.45);
+  }
+
+  .hueco__pos {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    font-family: var(--fuente-display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--dorado);
+  }
+
+  .hueco__x {
+    width: 42%;
+    max-width: 46px;
+    fill: none;
+    stroke: rgb(195 147 80 / 0.5);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .hueco__etiqueta {
+    font-family: var(--fuente-display);
+    font-size: 12px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgb(229 225 222 / 0.4);
+  }
+</style>

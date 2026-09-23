@@ -1,0 +1,31 @@
+---
+/**
+ * Home del sitio: hero + el equipo titular en la cancha + la banca.
+ *
+ * Fijate que la página casi no tiene HTML propio: arma componentes.
+ * Eso es lo que se busca — la página es el índice, la carne está en los
+ * componentes.
+ */
+import Sitio from '../layouts/Sitio.astro';
+import Hero from '../components/Hero.astro';
+import Formacion from '../components/Formacion.astro';
+import Banca from '../components/Banca.astro';
+---
+
+<Sitio
+  titulo="Real Betits — Zapping Liga Premier"
+  descripcion="Sitio del equipo Real Betits: formación, plantilla y datos de la Zapping Liga Premier, Sábado 2° DIV."
+  nombreAlScrollear
+>
+  <Hero />
+
+  <section class="seccion" id="formacion">
+    <header class="seccion__cabecera">
+      <h2 class="seccion__titulo">Formación</h2>
+    </header>
+
+    <Formacion ancho="860px" />
+
+    <Banca />
+  </section>
+</Sitio>

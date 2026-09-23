@@ -1,0 +1,407 @@
+---
+/**
+ * El camino: nuestras 5 jornadas como línea de tiempo.
+ *
+ * Es el cuerpo de la página de Partidos. La idea es que el AVANCE se entienda
+ * sin leer una palabra:
+ *   - el tramo ya jugado va en línea continua; el que falta, punteado
+ *   - los nodos jugados son sólidos y del color del resultado;
+ *     los pendientes son huecos, con anillo dorado que late
+ *
+ * Ojo con un detalle que NO es cosmético: cuando un partido está jugado pero le
+ * falta un lado del marcador (en esta liga hay 2 así), se trata como pendiente.
+ * Preferimos no pintar un color que no podemos afirmar.
+ *
+ * El despliegue de "los otros partidos del grupo" usa <details>, nativo: se abre
+ * sin una línea de JavaScript, igual que el menú del celular con `popover`.
+ *
+ * Las fotos de fondo son de la división (no del equipo) y solo existen para las
+ * fechas 1 y 2. Van muy apagadas para que sean textura, no contenido.
+ */
+import { Image } from 'astro:assets';
+import {
+  JORNADAS, resultado, marcadorTexto, marcadorDe, fechaLarga,
+} from '../lib/liga';
+import { escudoDe, escudoPropio } from '../lib/escudos';
+import { fotoDeFecha } from '../lib/galeria';
+
+/* nuestro escudo: el LOCAL, el mismo del navbar (no el que tiene la liga) */
+const escudoMio = escudoPropio;
+const fotos = (n: number) => fotoDeFecha(n);
+---
+
+<ol class="camino">
+  {
+    JORNADAS.map((j) => {
+      const r = resultado(j.nuestro);
+      const estado = r ?? 'pend';
+      const foto = fotos(j.n);
+      const escudoRival = escudoDe(j.rival);
+
+      return (
+        <li class:list={['camino__nodo', `camino__nodo--${estado}`]}>
+          <span class="camino__marca" aria-hidden="true" />
+
+          <article class="camino__tarjeta">
+            {foto && (
+              <Image
+                class="camino__foto"
+                src={foto}
+                alt=""
+                width={760}
+                format="webp"
+                quality={42}
+              />
+            )}
+            <span class="camino__numero" aria-hidden="true">{j.n}</span>
+
+            <header class="camino__cabecera">
+              <div>
+                <h3 class="camino__fecha">Fecha {j.n}</h3>
+                <p class="camino__cuando">{fechaLarga(j.nuestro.fecha)}</p>
+              </div>
+            </header>
+
+            <div class="camino__choque">
+              <div class="camino__bando">
+                {/* el nuestro nunca falta: es local, no depende de la liga */}
+                <img class="camino__escudo" src={escudoMio} alt="" width="42" height="42" />
+                <span class="camino__equipo">Real Betits</span>
+              </div>
+
+              <span class="camino__marcador">
+                {j.nuestro.jugado ? marcadorTexto(j.nuestro) : 'vs'}
+              </span>
+
+              <div class="camino__bando camino__bando--der">
+                <span class="camino__equipo">{j.rival}</span>
+                {escudoRival
+                  ? <img class="camino__escudo" src={escudoRival} alt="" width="42" height="42" />
+                  : <span class="camino__hueco" />}
+              </div>
+            </div>
+
+          </article>
+
+          {/*
+            El desplegable va FUERA de la tarjeta, y no es un capricho: adentro,
+            al abrirlo la tarjeta crece de alto y la foto de fondo
+            (position:absolute + object-fit:cover) se re-recorta y se ve
+            desplazada — el usuario lo describió como "la imagen se boguea".
+            Afuera, la tarjeta mide siempre lo mismo y la foto no se mueve nunca.
+          */}
+          <details class="camino__grupo">
+            <summary class="camino__resumen">
+              Ver los otros {j.resto.length} partidos del grupo
+            </summary>
+            <ul class="camino__otros">
+              {j.resto.map((q) => (
+                <li class="camino__otro">
+                  <span class="camino__otro-eq">{q.equipo1}</span>
+                  <span class="camino__otro-marcador">{marcadorDe(q)}</span>
+                  <span class="camino__otro-eq camino__otro-eq--der">{q.equipo2}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  /* ---------- la línea ---------- */
+  .camino {
+    margin: 0;
+    padding: 0 0 0 44px;
+    list-style: none;
+  }
+
+  .camino__nodo {
+    position: relative;
+    padding-bottom: 26px;
+  }
+
+  /* el tramo que baja hasta el nodo siguiente */
+  .camino__nodo::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 26px;
+    bottom: -2px;
+    width: 2px;
+    background: rgb(195 147 80 / 0.4);
+  }
+
+  /* punteado = todavía no se jugó */
+  .camino__nodo--pend::before {
+    background: repeating-linear-gradient(
+      to bottom,
+      rgb(195 147 80 / 0.5) 0 6px,
+      transparent 6px 13px
+    );
+  }
+
+  /* el último nodo no tiene a quién bajar */
+  .camino__nodo:last-child::before { display: none; }
+
+  /* ---------- el nodo ---------- */
+  .camino__marca {
+    position: absolute;
+    left: -35px;
+    top: 15px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--acento, rgb(195 147 80 / 0.5));
+    /* el anillo del color del fondo lo despega de la línea */
+    box-shadow: 0 0 0 4px var(--verde-950);
+  }
+
+  .camino__nodo--G { --acento: var(--verde-brillo); }
+  .camino__nodo--P { --acento: #c0554f; }
+  .camino__nodo--E { --acento: var(--dorado); }
+
+  /* pendiente: hueco con anillo dorado que late */
+  .camino__nodo--pend .camino__marca {
+    background: var(--verde-950);
+    border: 2px solid var(--dorado);
+    animation: latido-nodo 2.6s ease-in-out infinite;
+  }
+
+  @keyframes latido-nodo {
+    0%, 100% {
+      box-shadow: 0 0 0 4px var(--verde-950), 0 0 0 4px rgb(195 147 80 / 0.45);
+    }
+    50% {
+      box-shadow: 0 0 0 4px var(--verde-950), 0 0 0 11px rgb(195 147 80 / 0);
+    }
+  }
+
+  /* ---------- la tarjeta de la jornada ---------- */
+  .camino__tarjeta {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px 26px;
+    border: 1px solid rgb(229 225 222 / 0.12);
+    border-radius: var(--radio-chico);
+    background: linear-gradient(160deg, var(--verde-800), var(--verde-950));
+    /* recorta la foto y el número fantasma contra las esquinas */
+    overflow: hidden;
+  }
+
+  .camino__nodo--pend .camino__tarjeta {
+    border-style: dashed;
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  /* la foto de la división, de fondo y bien apagada */
+  .camino__foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.17;
+    z-index: 0;
+  }
+
+  /* el número de la fecha, enorme y translúcido: ritmo editorial, no contenido */
+  .camino__numero {
+    position: absolute;
+    top: -26px;
+    right: 10px;
+    z-index: 1;
+    font-family: var(--fuente-display);
+    font-size: 148px;
+    font-weight: 700;
+    line-height: 1;
+    color: rgb(229 225 222 / 0.05);
+    pointer-events: none;
+  }
+
+  .camino__cabecera,
+  .camino__choque,
+  .camino__grupo {
+    position: relative;
+    z-index: 2;
+  }
+
+  .camino__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .camino__fecha {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blanco);
+  }
+
+  .camino__cuando {
+    margin: 4px 0 0;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: rgb(229 225 222 / 0.58);
+  }
+
+  /* ---------- el choque ---------- */
+  .camino__choque {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .camino__bando {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .camino__bando--der {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .camino__escudo {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+  }
+
+  .camino__hueco {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    border: 1px dashed rgb(195 147 80 / 0.3);
+    border-radius: 50%;
+  }
+
+  .camino__equipo {
+    font-family: var(--fuente-display);
+    font-size: clamp(16px, 2.1vw, 21px);
+    font-weight: 700;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--blanco);
+  }
+
+  /* el tablero: panel hundido entre dos filetes dorados */
+  .camino__marcador {
+    padding: 5px 18px;
+    border-top: 1px solid rgb(195 147 80 / 0.4);
+    border-bottom: 1px solid rgb(195 147 80 / 0.4);
+    background: rgb(3 17 10 / 0.55);
+    box-shadow: inset 0 2px 9px rgb(0 0 0 / 0.5);
+    font-family: var(--fuente-display);
+    font-size: clamp(22px, 3.2vw, 32px);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--blanco);
+    white-space: nowrap;
+  }
+
+  .camino__nodo--pend .camino__marcador {
+    border-style: dashed;
+    color: rgb(195 147 80 / 0.75);
+    font-size: clamp(20px, 2.6vw, 26px);
+  }
+
+  /* ---------- los otros partidos del grupo ---------- */
+  /* Vive FUERA de la tarjeta: por eso tiene su propio marco. */
+  .camino__grupo {
+    margin-top: 10px;
+    padding: 0 16px;
+    border: 1px solid rgb(229 225 222 / 0.1);
+    border-radius: var(--radio-chico);
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  .camino__grupo[open] { border-color: rgb(195 147 80 / 0.3); }
+
+  .camino__resumen {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 0;
+    cursor: pointer;
+    font-size: 12.5px;
+    letter-spacing: 0.05em;
+    color: var(--dorado);
+    /* sacar el triángulo nativo */
+    list-style: none;
+  }
+
+  .camino__resumen::-webkit-details-marker { display: none; }
+
+  .camino__resumen::after {
+    content: '▾';
+    font-size: 11px;
+    transition: rotate 0.2s ease;
+  }
+
+  .camino__grupo[open] .camino__resumen::after { rotate: 180deg; }
+
+  .camino__otros {
+    margin: 0 0 14px;
+    padding: 12px 0 0;
+    border-top: 1px solid rgb(229 225 222 / 0.1);
+    list-style: none;
+  }
+
+  .camino__otro {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 0;
+    font-size: 13px;
+    color: rgb(229 225 222 / 0.7);
+  }
+
+  .camino__otro-eq { text-align: right; }
+
+  .camino__otro-eq--der { text-align: left; }
+
+  .camino__otro-marcador {
+    font-family: var(--fuente-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--crema);
+    white-space: nowrap;
+  }
+
+  /* ---------- celular ---------- */
+  @media (max-width: 640px) {
+    .camino { padding-left: 30px; }
+
+    .camino__nodo::before { left: -20px; }
+    .camino__marca { left: -27px; }
+
+    .camino__tarjeta { padding: 18px 16px; gap: 14px; }
+
+    .camino__numero { font-size: 104px; top: -16px; }
+
+    /* el choque se apila */
+    .camino__choque { grid-template-columns: 1fr; gap: 10px; }
+
+    .camino__bando,
+    .camino__bando--der { justify-content: center; text-align: center; }
+
+    .camino__marcador { justify-self: center; }
+
+    .camino__otro { font-size: 12px; gap: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .camino__nodo--pend .camino__marca { animation: none; }
+  }
+</style>

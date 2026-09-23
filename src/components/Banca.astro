@@ -1,0 +1,147 @@
+---
+/**
+ * Los jugadores que NO están en el equipo titular, como tira de cartas estilo FIFA.
+ *
+ * Se llama Banca y no Plantel a propósito: el plantel son los 16, y acá se
+ * muestran solo los 9 que quedan fuera del equipo titular. (El equipo titular
+ * son 7 — es fútbol 7, no fútbol 11.)
+ *
+ * Las cartas van lado a lado con un solape leve, de modo que de cada una se ve
+ * casi todo. Al pasar el cursor, la carta señalada se levanta, sube al frente y
+ * se ve completa; las demás se atenúan un poco para que la vista se vaya sola a
+ * la que estás mirando.
+ *
+ * CÓMO FUNCIONA EL SOLAPE (vale la pena entenderlo, es el truco del componente):
+ *
+ *   .banca__slot  = la "casilla" de cada carta, ancho = 100% / --n
+ *   .banca__carta = la carta, MÁS ANCHA que su casilla y centrada en ella
+ *
+ * Como la carta se centra en su casilla con `left:50% + translate:-50%`, el
+ * solape queda simétrico: no hay que tratar distinto a la primera ni a la
+ * última. Y como el ancho de la casilla depende de --n (el número de jugadores),
+ * si mañana entra o sale alguien de la liga, la tira se reacomoda sola.
+ *
+ * Nada de esto usa JavaScript: el hover es CSS puro.
+ *
+ * En pantallas angostas la tira pasa a desplazarse en horizontal, porque si no
+ * el solape se volvería tan grande que no se vería nada de ninguna.
+ */
+import CartaJugador from './CartaJugador.astro';
+import { BANCA_ORDENADA, NOTA, STATS, iniciales, etiquetaPosicion } from '../lib/plantilla';
+
+const total = BANCA_ORDENADA.length;
+---
+
+<div class="banca">
+  <ul class="banca__tira" style={`--n: ${total}`}>
+    {BANCA_ORDENADA.map((j) => (
+      <li class="banca__slot">
+        <div class="banca__carta">
+          <CartaJugador
+            nombre={j.nombre}
+            posicion={etiquetaPosicion(j.posicion)}
+            nota={NOTA}
+            iniciales={iniciales(j.nombre)}
+            stats={STATS}
+          />
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .banca {
+    /* El alto de la carta se deriva del ancho: el marco tiene aspect-ratio 3/4.15 */
+    --ancho-carta: 142px;
+    --alto-carta: calc(var(--ancho-carta) * 1.3833);
+    /* cuánto se levanta la carta al pasar el cursor */
+    --levantar: 26px;
+  }
+
+  .banca__tira {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    /* Aire arriba para que la carta levantada no se corte contra el borde */
+    padding: 30px 0 0;
+    list-style: none;
+  }
+
+  .banca__slot {
+    position: relative;
+    flex: none;
+    width: calc(100% / var(--n));
+    height: var(--alto-carta);
+    transition: opacity 0.3s ease;
+  }
+
+  .banca__carta {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: var(--ancho-carta);
+    translate: -50% 0;
+    transition: translate 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* --- interacción ---
+     El LEVANTAMIENTO va sin condicionar: es el comportamiento pedido, y así
+     funciona también en táctil (donde "hover" llega al tocar).
+     ⚠️ Aprendido a la mala: NO envolver esto en @media (hover: hover).
+     Chromium headless reporta matchMedia('(hover: hover)') = FALSE, así que
+     adentro de esa condición la interacción se vuelve imposible de verificar
+     (y cualquier navegador que reporte igual se queda sin efecto). */
+  .banca__slot:hover,
+  .banca__slot:focus-within { z-index: 5; }
+
+  .banca__slot:hover .banca__carta,
+  .banca__slot:focus-within .banca__carta {
+    translate: -50% calc(-1 * var(--levantar));
+  }
+
+  /* El ATENUADO del resto sí se condiciona: en táctil el "hover" se dispara con
+     el toque y oscurecer las otras cartas sería molesto. */
+  @media (hover: hover) {
+    .banca__tira:hover .banca__slot { opacity: 0.6; }
+    .banca__tira:hover .banca__slot:hover { opacity: 1; }
+  }
+
+  /* --- pantallas angostas: la tira se desplaza en horizontal --- */
+  @media (max-width: 900px) {
+    .banca__tira {
+      justify-content: flex-start;
+      overflow-x: auto;
+      /* OJO: overflow-x:auto obliga a overflow-y:auto, así que el aire de
+         arriba tiene que ir como padding; con margin la carta levantada
+         quedaría recortada. */
+      padding: 30px 22px 14px;
+      scroll-snap-type: x proximity;
+    }
+
+    .banca__slot {
+      width: auto;
+      height: auto;
+      scroll-snap-align: center;
+    }
+
+    .banca__carta {
+      position: static;
+      translate: none;
+      width: var(--ancho-carta);
+    }
+
+    /* solape más suave: acá hay ancho para ver casi toda la carta */
+    .banca__slot + .banca__slot { margin-left: -34px; }
+
+    .banca__slot:hover .banca__carta,
+    .banca__slot:focus-within .banca__carta {
+      translate: 0 calc(-1 * var(--levantar));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .banca__carta { transition: none; }
+    .banca__slot { transition: none; }
+  }
+</style>

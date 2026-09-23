@@ -1,0 +1,335 @@
+---
+/**
+ * El partido que viene, mostrado como una ENTRADA de estadio.
+ *
+ * Por qué un ticket y no una tarjeta más: es la metáfora más "fútbol" que hay,
+ * y resuelve algo concreto — separa lo que es DATO (los equipos, la fecha)
+ * de lo que es TALÓN DESPRENDIBLE (cuándo y a qué hora), que es exactamente
+ * como se lee una entrada de verdad.
+ *
+ * Detalles que hacen que se lea como ticket y no como tarjeta:
+ *   - dos muescas semicirculares cortadas en la línea de perforación
+ *     (círculos del color del fondo, recortados por el overflow del ticket)
+ *   - la perforación punteada entre el cuerpo y el talón
+ *   - el talón con el día grande, el mes y la hora
+ *
+ * Animación: un brillo dorado que barre la entrada cada 7 s. CSS puro, y se
+ * apaga con prefers-reduced-motion.
+ *
+ * Datos: la posición del rival en el grupo sale de la tabla (lib/liga), así que
+ * la entrada dice algo real y no solo la fecha.
+ */
+import {
+  proximoPartido, rival, fechaLarga, fechaPartes, filaDe,
+} from '../lib/liga';
+import { escudoDe, escudoPropio } from '../lib/escudos';
+
+const p = proximoPartido();
+const r = p ? rival(p) : null;
+const partes = p ? fechaPartes(p.fecha) : null;
+const filaRival = r ? filaDe(r) : null;
+/* nuestro escudo: el LOCAL, el mismo del navbar (no el que tiene la liga) */
+const escudoMio = escudoPropio;
+const escudoRival = r ? escudoDe(r) : null;
+---
+
+{
+  p && (
+    <article class="ticket">
+      <span class="ticket__brillo" aria-hidden="true" />
+
+      <div class="ticket__cuerpo">
+        <p class="ticket__etiqueta">Próximo partido</p>
+
+        <div class="ticket__choque">
+          <div class="ticket__lado">
+            {/* el nuestro nunca falta: es local, no depende de la liga */}
+            <img class="ticket__escudo" src={escudoMio} alt="" width="56" height="56" />
+            <span class="ticket__equipo">Real Betits</span>
+          </div>
+
+          <div class="ticket__centro">
+            <span class="ticket__vs">vs</span>
+            <span class="ticket__fecha">{fechaLarga(p.fecha)}</span>
+          </div>
+
+          <div class="ticket__lado">
+            {escudoRival
+              ? <img class="ticket__escudo" src={escudoRival} alt="" width="56" height="56" />
+              : <span class="ticket__hueco" />}
+            <span class="ticket__equipo">{r}</span>
+          </div>
+        </div>
+
+        <div class="ticket__datos">
+          {
+            filaRival && (
+              <span class="ticket__chip ticket__chip--suave">
+                Rival {filaRival.pos}° del grupo {filaRival.grupo} · {filaRival.pts} pts
+              </span>
+            )
+          }
+        </div>
+      </div>
+
+      <div class="ticket__talon">
+        <span class="ticket__talon-dia">{partes?.dia}</span>
+        <span class="ticket__talon-mes">{partes?.mes}</span>
+        <span class="ticket__talon-hora">{partes?.hora ?? 's/hora'}</span>
+      </div>
+    </article>
+  )
+}
+
+<style>
+  .ticket {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    border-radius: var(--radio);
+    /* overflow oculto: recorta los círculos de las muescas contra el borde */
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(
+        115deg,
+        rgb(255 255 255 / 0.028) 0 16px,
+        transparent 16px 32px
+      ),
+      linear-gradient(155deg, var(--verde-800), var(--verde-950));
+    box-shadow: var(--sombra-dorada);
+  }
+
+  /* ---------- brillo que barre ---------- */
+  .ticket__brillo {
+    position: absolute;
+    inset: -40% -70%;
+    background: linear-gradient(
+      100deg,
+      transparent 44%,
+      rgb(227 189 130 / 0.13) 50%,
+      transparent 56%
+    );
+    pointer-events: none;
+    animation: barrido 7s ease-in-out infinite;
+  }
+
+  @keyframes barrido {
+    0%, 12% { translate: -60% 0; }
+    62%, 100% { translate: 60% 0; }
+  }
+
+  /* ---------- cuerpo ---------- */
+  .ticket__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 26px 30px 24px;
+  }
+
+  .ticket__etiqueta {
+    margin: 0;
+    font-family: var(--fuente-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--dorado);
+  }
+
+  .ticket__choque {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .ticket__lado {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .ticket__lado:last-child {
+    flex-direction: row-reverse;
+    text-align: right;
+  }
+
+  .ticket__escudo {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    /* el escudo del rival puede venir en cualquier formato: lo dejamos respirar */
+    filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.5));
+  }
+
+  /* si un equipo no tiene escudo subido, reservamos el mismo espacio */
+  .ticket__hueco {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px dashed rgb(195 147 80 / 0.3);
+  }
+
+  .ticket__equipo {
+    font-family: var(--fuente-display);
+    font-size: clamp(20px, 2.6vw, 28px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--blanco);
+    line-height: 1.05;
+    /* nombres largos ("AC DEPORTES TE COJO") no deben desarmar la entrada */
+    overflow-wrap: anywhere;
+  }
+
+  .ticket__centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .ticket__vs {
+    font-family: var(--fuente-display);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--dorado);
+    letter-spacing: 0.06em;
+    animation: latido-vs 3.4s ease-in-out infinite;
+  }
+
+  @keyframes latido-vs {
+    0%, 100% { opacity: 0.8; scale: 1; }
+    50% { opacity: 1; scale: 1.07; }
+  }
+
+  .ticket__fecha {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: rgb(229 225 222 / 0.62);
+    white-space: nowrap;
+  }
+
+  .ticket__datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .ticket__chip {
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgb(195 147 80 / 0.5);
+    background: rgb(195 147 80 / 0.12);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dorado-claro);
+  }
+
+  .ticket__chip--suave {
+    border-color: rgb(229 225 222 / 0.16);
+    background: rgb(229 225 222 / 0.05);
+    color: rgb(229 225 222 / 0.66);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-weight: 500;
+  }
+
+  /* ---------- talón ---------- */
+  .ticket__talon {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 116px;
+    padding: 22px 20px;
+    /* la perforación */
+    border-left: 1px dashed rgb(195 147 80 / 0.45);
+    background: rgb(3 17 10 / 0.45);
+  }
+
+  /* las muescas: círculos del color del fondo, cortados por el overflow */
+  .ticket__talon::before,
+  .ticket__talon::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--verde-950);
+  }
+
+  .ticket__talon::before { left: -11px; top: -11px; }
+  .ticket__talon::after { left: -11px; bottom: -11px; }
+
+  .ticket__talon-dia {
+    font-family: var(--fuente-display);
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 0.9;
+    color: var(--blanco);
+  }
+
+  .ticket__talon-mes {
+    font-family: var(--fuente-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--dorado);
+  }
+
+  .ticket__talon-hora {
+    margin-top: 8px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: rgb(229 225 222 / 0.6);
+  }
+
+  /* ---------- celular: el talón pasa a ser una franja abajo ---------- */
+  @media (max-width: 640px) {
+    .ticket { grid-template-columns: 1fr; }
+
+    .ticket__cuerpo { padding: 22px 22px 20px; gap: 20px; }
+
+    /* el choque se apila: escudo+nombre, VS+fecha, escudo+nombre */
+    .ticket__choque { grid-template-columns: 1fr; gap: 14px; }
+
+    .ticket__lado,
+    .ticket__lado:last-child {
+      flex-direction: row;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .ticket__talon {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      padding: 12px 18px;
+      border-left: 0;
+      border-top: 1px dashed rgb(195 147 80 / 0.45);
+    }
+
+    /* las muescas se mudan a los costados de la franja */
+    .ticket__talon::before { left: -11px; top: -11px; }
+    .ticket__talon::after { left: auto; right: -11px; top: -11px; bottom: auto; }
+
+    .ticket__talon-dia { font-size: 32px; }
+    .ticket__talon-hora { margin-top: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticket__brillo,
+    .ticket__vs { animation: none; }
+  }
+</style>

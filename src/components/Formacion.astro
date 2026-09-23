@@ -1,0 +1,30 @@
+---
+/**
+ * La formación: la cancha con las cartas reales del equipo titular.
+ *
+ * Existe para no repetir el mismo bloque en la home y en /cancha.
+ * Solo se encarga de la parte visual; los datos salen de src/lib/plantilla.ts.
+ */
+import Cancha from './Cancha.astro';
+import CartaJugador from './CartaJugador.astro';
+import { TITULARES, NOTA, STATS, iniciales } from '../lib/plantilla';
+
+interface Props {
+  ancho?: string;
+}
+const { ancho = '860px' } = Astro.props;
+---
+
+<Cancha ancho={ancho}>
+  {TITULARES.map((t) => (
+    <div class="jugador" style={`left: ${t.left}%; bottom: ${t.bottom}%;`}>
+      <CartaJugador
+        nombre={t.nombre}
+        posicion={t.pos}
+        nota={NOTA}
+        iniciales={iniciales(t.nombre)}
+        stats={STATS}
+      />
+    </div>
+  ))}
+</Cancha>

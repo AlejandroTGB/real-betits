@@ -1,0 +1,172 @@
+---
+/**
+ * La campaña: los 5 partidos de un vistazo, más nuestra línea de la tabla.
+ *
+ * Para qué sirve: en dos segundos saber cómo viene el equipo. Es el patrón que
+ * usan las apps de fútbol (una píldora por partido), y funciona porque el color
+ * hace el trabajo y el marcador confirma.
+ *
+ * OJO con los pendientes: no llevan marcador NI letra. Antes decían "L"/"V"
+ * (local/visita) y confundía, porque la letra parece un resultado. Además
+ * local/visita NO existen en esta liga: se juega siempre en la misma cancha.
+ * Ahora muestran la fecha, que es el dato que sí sirve para algo que no se jugó.
+ *
+ * Estados: G ganado · E empatado · P perdido · pendiente.
+ * Y un quinto caso mezclado: jugado pero con el marcador incompleto (en la liga
+ * hay 2 así). Esos caen en `pendiente` a propósito: preferimos no pintar un
+ * color que no podemos afirmar.
+ */
+import { JORNADAS, resultado, marcadorTexto, fechaCorta, miFila } from '../lib/liga';
+import TablaPosiciones from './TablaPosiciones.astro';
+
+const ROTULO: Record<string, string> = { G: 'Ganado', E: 'Empate', P: 'Perdido' };
+
+/**
+ * Nuestra fila de la tabla, tal cual la publica la liga.
+ *
+ * Se la pasamos a TablaPosiciones como lista de UNO: acá mostramos nuestra línea,
+ * y la sección Tabla (más adelante) le pasará las 6 del grupo al MISMO componente.
+ *
+ * Ojo con la trampa de nombres: en la fila de la liga `d` son EMPATADOS y `l`
+ * son PERDIDOS (win/draw/loss). No confundir con la `d` de otras partes del
+ * fútbol hispano, donde suele ser derrotas. Ver el aviso en TablaPosiciones.
+ */
+const fila = miFila();
+---
+
+<div class="campana">
+  <ul class="campana__tira">
+    {
+      JORNADAS.map((j) => {
+        const r = resultado(j.nuestro);
+        const estado = r ?? 'pend';
+        return (
+          <li class:list={['campana__pildora', `campana__pildora--${estado}`]}>
+            <span class="campana__fecha">F{j.n}</span>
+            <span class="campana__marcador">
+              {j.nuestro.jugado ? marcadorTexto(j.nuestro) : fechaCorta(j.nuestro.fecha)}
+            </span>
+            <span class="campana__rival">{j.rival}</span>
+            <span class="campana__estado">{r ? ROTULO[r] : 'sin jugar'}</span>
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  <div class="campana__tabla">
+    <TablaPosiciones filas={fila ? [fila] : []} />
+  </div>
+</div>
+
+<style>
+  .campana__tira {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .campana__pildora {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 16px 8px 14px;
+    border: 1px solid rgb(229 225 222 / 0.13);
+    border-radius: var(--radio-chico);
+    background: rgb(255 255 255 / 0.025);
+    text-align: center;
+  }
+
+  /* El resultado se comunica con el BORDE y el FONDO, nada más.
+     Se probó una barrita de color arriba y el usuario la rechazó:
+     "se ve vibecodeado". Un adorno que no aporta información, fuera. */
+
+  .campana__pildora--G {
+    border-color: rgb(47 160 109 / 0.42);
+    background: rgb(47 160 109 / 0.07);
+  }
+
+  .campana__pildora--P {
+    border-color: rgb(192 85 79 / 0.4);
+    background: rgb(192 85 79 / 0.06);
+  }
+
+  .campana__pildora--E {
+    border-color: rgb(195 147 80 / 0.45);
+    background: rgb(195 147 80 / 0.07);
+  }
+
+  /* pendiente: apagado y punteado, que se note de lejos que no se jugó */
+  .campana__pildora--pend {
+    border-style: dashed;
+    background: transparent;
+  }
+
+  .campana__fecha {
+    font-family: var(--fuente-display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(229 225 222 / 0.5);
+  }
+
+  .campana__marcador {
+    font-family: var(--fuente-display);
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--blanco);
+  }
+
+  /* el pendiente muestra una FECHA, no un marcador: tiene que verse distinto */
+  .campana__pildora--pend .campana__marcador {
+    font-size: 21px;
+    color: rgb(229 225 222 / 0.4);
+  }
+
+  .campana__rival {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: rgb(229 225 222 / 0.78);
+    /* nombres largos: dos líneas y corta, sin desarmar la píldora */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .campana__estado {
+    margin-top: 3px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(229 225 222 / 0.42);
+  }
+
+  /* la tabla arranca con aire respecto de la tira de píldoras */
+  .campana__tabla {
+    margin-top: 26px;
+  }
+
+  /* ---------- pantallas angostas: la tira se desplaza ---------- */
+  @media (max-width: 700px) {
+    .campana__tira {
+      display: flex;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scroll-snap-type: x proximity;
+    }
+
+    .campana__pildora {
+      flex: none;
+      width: 108px;
+      scroll-snap-align: center;
+    }
+  }
+</style>

@@ -1,0 +1,319 @@
+---
+import Base from '../layouts/Base.astro';
+import CartaJugador from '../components/CartaJugador.astro';
+import CartaHueco from '../components/CartaHueco.astro';
+import Cancha from '../components/Cancha.astro';
+import escudo from '../assets/escudo.png';
+
+const paleta = [
+  { nombre: 'verde-950', hex: '#03110a', uso: 'Fondo de página' },
+  { nombre: 'verde-900', hex: '#05190f', uso: 'Verde del escudo (medido)' },
+  { nombre: 'verde-800', hex: '#0a2a1a', uso: 'Superficies / tarjetas' },
+  { nombre: 'verde-700', hex: '#10402a', uso: 'Bordes, estados hover' },
+  { nombre: 'verde-600', hex: '#16573b', uso: 'Acentos, pasto' },
+  { nombre: 'dorado', hex: '#c39350', uso: 'Acento principal (medido)' },
+  { nombre: 'dorado-claro', hex: '#e3bd82', uso: 'Números y destacados' },
+  { nombre: 'crema', hex: '#e5e1de', uso: 'Texto sobre verde (medido)' },
+  { nombre: 'blanco', hex: '#f7f7f7', uso: 'Títulos (medido)' },
+];
+
+const alejandro = {
+  nombre: 'Alejandro Torres',
+  posicion: 'MC',
+  nota: 84,
+  iniciales: 'AT',
+  stats: { rit: 74, tir: 78, pas: 86, reg: 82, def: 71, fis: 76 },
+};
+
+const companeros = [
+  { nombre: 'Francisco Pizarro', posicion: 'DC', nota: 86, iniciales: 'FP',
+    stats: { rit: 81, tir: 88, pas: 72, reg: 79, def: 42, fis: 83 } },
+  { nombre: 'Cristóbal Zecchetto', posicion: 'EI', nota: 79, iniciales: 'CZ',
+    stats: { rit: 88, tir: 74, pas: 76, reg: 85, def: 45, fis: 68 } },
+];
+
+/**
+ * Los 7 puestos de la 1-2-3-1 sobre la cancha vertical.
+ * `left` es el CENTRO de la carta (el componente aplica translateX(-50%)).
+ * `bottom` se mide desde el arco propio (abajo).
+ * Van de lejos a cerca en el DOM para que el orden de apilado sea natural.
+ */
+const titulares = [
+  { pos: 'DEL', detalle: 'delantero',        left: 50, bottom: 80 },
+  { pos: 'MED', detalle: 'volante izquierdo', left: 17, bottom: 52 },
+  { pos: 'MED', detalle: 'volante central',   left: 50, bottom: 52 },
+  { pos: 'MED', detalle: 'volante derecho',   left: 83, bottom: 52 },
+  { pos: 'DEF', detalle: 'defensa izquierdo', left: 27, bottom: 24 },
+  { pos: 'DEF', detalle: 'defensa derecho',   left: 73, bottom: 24 },
+  { pos: 'ARQ', detalle: 'arquero',           left: 50, bottom: 4 },
+];
+---
+
+<Base titulo="Guía de estilo — Real Betits">
+  <main class="guia">
+    <header class="guia__cabecera">
+      <img src={escudo.src} alt="Escudo de Real Betits" width="96" height="142" />
+      <div>
+        <h1>Guía de estilo</h1>
+        <p class="guia__sub">Real Betits · Zapping Liga Premier · Sábado 2° DIV</p>
+      </div>
+    </header>
+
+    <p class="aviso">
+      Esta página es el <b>banco de pruebas visual</b>: los colores, la tipografía y las cartas
+      son los componentes reales que después usa la home. Aquí se ajusta, y después se reutiliza.
+      El efecto hover de las cartas es <b>CSS puro</b>, sin JavaScript.
+    </p>
+
+    <!-- ---------------- PALETA ---------------- -->
+    <section>
+      <h2>1 · Paleta</h2>
+      <p class="nota">
+        Los tonos marcados como <i>medido</i> salen del escudo real: los muestreé píxel a píxel.
+        El verde del club es muy oscuro (<code>#05190f</code>, casi negro), así que la rampa
+        de verdes se genera levantando ese tono para tener jerarquía visual.
+      </p>
+      <ul class="paleta">
+        {paleta.map((c) => (
+          <li>
+            <span class="muestra" style={`background:${c.hex}`}></span>
+            <div>
+              <b>{c.nombre}</b>
+              <code>{c.hex}</code>
+              <em>{c.uso}</em>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- ---------------- TIPOGRAFÍA ---------------- -->
+    <section>
+      <h2>2 · Tipografía</h2>
+      <p class="nota">
+        <b>Barlow Condensed</b> para títulos, números y stats (aire deportivo, muy legible en
+        tamaños grandes). <b>Inter</b> para el texto corrido.
+      </p>
+      <div class="tipos">
+        <p class="t-display">Barlow Condensed 800</p>
+        <p class="t-h1">Titular de sección</p>
+        <p class="t-h3">Subtítulo de bloque</p>
+        <p class="t-num">84 86 79</p>
+        <p class="t-body">
+          Inter se usa en párrafos, descripciones y datos secundarios. La idea es que el
+          contenido largo se lea cómodo y los números peguen fuerte.
+        </p>
+      </div>
+    </section>
+
+    <!-- ---------------- CARTA ---------------- -->
+    <section>
+      <h2>3 · Carta de jugador</h2>
+      <p class="nota">
+        Pasa el mouse por encima (o enfoca la carta con el teclado): se inclina en 3D, barre un
+        brillo y se encienden los rayos del fondo. <b>Sin JavaScript.</b>{' '}
+        Mira el escudo de la esquina superior derecha: es el real, ya recortado sin fondo.
+      </p>
+      <div class="muestrario">
+        <figure>
+          <CartaJugador
+            nombre={alejandro.nombre}
+            posicion={alejandro.posicion}
+            nota={alejandro.nota}
+            iniciales={alejandro.iniciales}
+            stats={alejandro.stats}
+          />
+          <figcaption>Estado normal (tu carta)</figcaption>
+        </figure>
+        <figure>
+          <CartaJugador
+            nombre={alejandro.nombre}
+            posicion={alejandro.posicion}
+            nota={alejandro.nota}
+            iniciales={alejandro.iniciales}
+            stats={alejandro.stats}
+            demo
+          />
+          <figcaption>Con hover (forzado para la captura)</figcaption>
+        </figure>
+        <figure>
+          <CartaJugador
+            nombre={companeros[1].nombre}
+            posicion={companeros[1].posicion}
+            nota={companeros[1].nota}
+            iniciales={companeros[1].iniciales}
+            stats={companeros[1].stats}
+            variante="suplente"
+          />
+          <figcaption>Variante apagada</figcaption>
+        </figure>
+      </div>
+      <p class="nota nota--chica">
+        Los stats son de ejemplo: todavía no definimos cómo se calculan.
+        Los tres nombres son tuyos y de compañeros que aparecen en los goleadores de la liga.
+      </p>
+    </section>
+
+    <!-- ---------------- CANCHA ---------------- -->
+    <section id="cancha">
+      <h2>4 · La cancha</h2>
+      <p class="nota">
+        La cancha va <b>vertical</b> (tu arco abajo, como en Ultimate Team) y el plano se inclina
+        con <code>rotateX(46deg)</code>. Cada carta se contrainclina para quedar de pie sobre el
+        pasto, con el pivote en su borde inferior.
+      </p>
+      <Cancha ancho="860px">
+        {titulares.map((j) => (
+          <div class="jugador" style={`left: ${j.left}%; bottom: ${j.bottom}%;`}>
+            <CartaHueco posicion={j.pos} detalle={j.detalle} />
+          </div>
+        ))}
+      </Cancha>
+      <p class="nota nota--chica">
+        Los 7 puestos de la <b>1-2-3-1</b>: arquero, dos defensas, tres volantes y un delantero.
+        Son huecos a propósito — cuando definamos los 14 jugadores y sus puestos, cada uno toma
+        su lugar. El 7 calza con el reglamento de la liga: <i>"se jugará con 7 jugadores por lado"</i>.
+      </p>
+    </section>
+
+    <footer class="guia__pie">
+      <p>
+        Real Betits · datos de la liga vía API de Copa Fácil ·
+        escudo desde el Instagram del equipo
+      </p>
+    </footer>
+  </main>
+</Base>
+
+<style>
+  .guia {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .guia__cabecera {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgb(195 147 80 / 0.3);
+  }
+
+  .guia__cabecera img { height: 96px; width: auto; filter: drop-shadow(0 8px 20px rgb(0 0 0 / 0.6)); }
+
+  .guia__cabecera h1 { font-size: 52px; font-weight: 800; }
+  .guia__sub { margin: 6px 0 0; color: var(--dorado); font-size: 15px; letter-spacing: 0.04em; }
+
+  .aviso {
+    margin: 0;
+    padding: 18px 20px;
+    border-left: 3px solid var(--dorado);
+    background: rgb(10 42 26 / 0.5);
+    border-radius: 0 var(--radio-chico) var(--radio-chico) 0;
+    font-size: 15px;
+    color: rgb(229 225 222 / 0.9);
+  }
+
+  section { display: flex; flex-direction: column; gap: 14px; }
+
+  h2 {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--blanco);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgb(195 147 80 / 0.25);
+  }
+
+  .nota { margin: 0; font-size: 15px; color: rgb(229 225 222 / 0.72); max-width: 70ch; }
+  .nota code, .aviso code {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    background: rgb(3 17 10 / 0.8);
+    padding: 2px 6px;
+    border-radius: 5px;
+    color: var(--dorado-claro);
+  }
+  .nota--chica { font-size: 13px; color: rgb(229 225 222 / 0.5); }
+
+  /* --- paleta --- */
+  .paleta {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px;
+  }
+  .paleta li {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px;
+    background: rgb(10 42 26 / 0.4);
+    border: 1px solid rgb(195 147 80 / 0.18);
+    border-radius: var(--radio-chico);
+  }
+  .muestra {
+    width: 46px; height: 46px; border-radius: 8px; flex: none;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+  }
+  .paleta b { display: block; font-family: var(--fuente-display); font-size: 15px; letter-spacing: 0.06em; }
+  .paleta code { font-family: ui-monospace, monospace; font-size: 12px; color: var(--dorado); }
+  .paleta em { display: block; font-size: 12px; font-style: normal; color: rgb(229 225 222 / 0.55); }
+
+  /* --- tipografía --- */
+  .tipos {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 20px;
+    background: rgb(10 42 26 / 0.35);
+    border: 1px solid rgb(195 147 80 / 0.18);
+    border-radius: var(--radio-chico);
+  }
+  .tipos p { margin: 0; }
+  .t-display { font-family: var(--fuente-display); font-weight: 800; font-size: 20px; color: var(--dorado); letter-spacing: 0.1em; text-transform: uppercase; }
+  .t-h1 { font-family: var(--fuente-display); font-weight: 700; font-size: 44px; text-transform: uppercase; color: var(--blanco); line-height: 1; }
+  .t-h3 { font-family: var(--fuente-display); font-weight: 600; font-size: 26px; text-transform: uppercase; color: var(--crema); }
+  .t-num { font-family: var(--fuente-display); font-weight: 800; font-size: 40px; color: var(--blanco); letter-spacing: 0.06em; }
+  .t-body { font-size: 15px; color: rgb(229 225 222 / 0.8); max-width: 60ch; }
+
+  /* --- muestrario de cartas --- */
+  .muestrario {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 26px;
+    align-items: start;
+    padding: 34px 26px;
+    background:
+      radial-gradient(90% 70% at 50% 0%, rgb(22 87 59 / 0.35), transparent 70%),
+      rgb(3 17 10 / 0.6);
+    border: 1px solid rgb(195 147 80 / 0.18);
+    border-radius: var(--radio);
+  }
+
+  @media (max-width: 760px) {
+    .muestrario { grid-template-columns: 1fr; justify-items: center; }
+  }
+
+  .muestrario figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .muestrario figcaption {
+    font-family: var(--fuente-display);
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgb(229 225 222 / 0.5);
+    text-align: center;
+  }
+
+  .guia__pie {
+    padding-top: 22px;
+    border-top: 1px solid rgb(195 147 80 / 0.2);
+    font-size: 13px;
+    color: rgb(229 225 222 / 0.45);
+  }
+  .guia__pie p { margin: 0; }
+</style>

@@ -1,0 +1,122 @@
+/* ==========================================================================
+   Design tokens de Real Betits
+   Los valores marcados "medido" salen del escudo real (src/assets/escudo.png),
+   muestreados pixel a pixel. La rampa de verdes se deriva levantando ese verde
+   base, porque el del escudo (#05190f) es casi negro y solo no alcanza para
+   construir jerarquía visual.
+   ========================================================================== */
+
+:root {
+  /* --- Verde del club --- */
+  --verde-950: #03110a;  /* fondo más profundo */
+  --verde-900: #05190f;  /* MEDIDO — verde del escudo */
+  --verde-800: #0a2a1a;  /* superficies */
+  --verde-700: #10402a;  /* bordes, hover */
+  --verde-600: #16573b;  /* acentos */
+  --verde-500: #1f7a52;  /* highlights */
+  --verde-brillo: #2fa06d;
+
+  /* --- Dorado (del escudo) --- */
+  --dorado: #c39350;        /* MEDIDO */
+  --dorado-claro: #e3bd82;
+  --dorado-oscuro: #7d5c2e;
+
+  /* --- Neutros --- */
+  --crema: #e5e1de;     /* MEDIDO */
+  --blanco: #f7f7f7;    /* MEDIDO */
+  --tinta: #0b0d0c;
+
+  /* --- Tipografía --- */
+  --fuente-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --fuente-texto: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* --- Espaciado y forma --- */
+  --radio: 18px;
+  --radio-chico: 10px;
+  --sombra: 0 18px 40px rgb(3 17 10 / 0.55);
+  --sombra-dorada: 0 0 0 1px rgb(195 147 80 / 0.35), 0 20px 50px rgb(3 17 10 / 0.6);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--verde-950);
+  color: var(--crema);
+  font-family: var(--fuente-texto);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--fuente-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+  line-height: 1;
+}
+
+a { color: var(--dorado); }
+
+/* ==========================================================================
+   Secciones: estilo compartido por las secciones de página.
+   Va acá y no en cada página porque lo van a usar muchas (Partidos, Tabla,
+   Galería...). Si estuviera duplicado en cada .astro, tarde o temprano una
+   queda distinta de las otras.
+   ========================================================================== */
+
+.seccion {
+  max-width: 1060px;
+  margin: 0 auto;
+  /* Menos aire arriba: el hueco entre el hero y el primer título se sentía
+     interminable. Abajo se mantiene, que ahí sí separa secciones. */
+  padding: 46px 24px 74px;
+  scroll-margin-top: 80px;  /* que el navbar fijo no tape el título al saltar */
+}
+
+.seccion__cabecera {
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgb(195 147 80 / 0.25);
+  text-align: center;
+}
+
+.seccion__titulo {
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 700;
+  color: var(--blanco);
+}
+
+.seccion__sub {
+  margin: 7px 0 0;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dorado);
+}
+
+/* ==========================================================================
+   Fade entre páginas (View Transitions).
+
+   ::view-transition-old = el contenido que se va
+   ::view-transition-new = el contenido que llega
+   El viejo sube y se desvanece; el nuevo entra desde abajo. Da la sensación
+   de "avanzar hacia el contenido" en vez de un simple parpadeo.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: 220ms cubic-bezier(0.4, 0, 1, 1) both salida;
+  }
+  ::view-transition-new(root) {
+    animation: 300ms cubic-bezier(0.22, 1, 0.36, 1) both entrada;
+  }
+}
+
+@keyframes salida {
+  to { opacity: 0; transform: translateY(-10px) scale(0.995); }
+}
+
+@keyframes entrada {
+  from { opacity: 0; transform: translateY(14px); }
+}

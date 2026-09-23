@@ -1,0 +1,173 @@
+---
+/**
+ * Página de trabajo: la formación sola, a pantalla completa.
+ *
+ * Sirve para iterar el diseño sin el resto del sitio, y para el diagnóstico de
+ * superposiciones con ?debug=1.
+ *
+ * Ojo que NO repite nada: usa el mismo componente <Formacion /> y los mismos
+ * datos (src/lib/plantilla.ts) que la home. Si cambia el equipo titular, cambia
+ * en los dos.
+ */
+import Base from '../layouts/Base.astro';
+import Formacion from '../components/Formacion.astro';
+import { BANCA, iniciales } from '../lib/plantilla';
+import datos from '../data/plantilla.json';
+---
+
+<Base titulo="Cancha — Real Betits">
+  <main class="solo">
+    <h1 class="titulo">Formación</h1>
+    <p class="sub">Real Betits · 1-2-3-1 · Zapping Liga Premier, Sábado 2° DIV</p>
+
+    <Formacion ancho="860px" />
+
+    <p class="nota">
+      <b>Stats en 67 para todos</b>, a propósito, hasta que definamos cómo se calculan.
+      Los números reales de la temporada están guardados aparte (ver abajo).
+    </p>
+
+    <section class="banca">
+      <h2>Banca y resto del plantel</h2>
+      <p class="nota nota--chica">
+        Los {BANCA.length} jugadores que no están en el equipo titular. Ordenados por partidos jugados.
+      </p>
+      <ul class="grilla">
+        {BANCA.map((j) => (
+          <li>
+            <div class="mini">
+              <span class="mini__ini">{iniciales(j.nombre)}</span>
+              <span class="mini__nombre">{j.nombre}</span>
+              <span class="mini__pos">{j.posicion || 'sin puesto'}</span>
+              <span class="mini__stats">
+                {j.partidos} PJ{j.goles > 0 ? ` · ${j.goles} G` : ''}{j.amarillas > 0 ? ` · ${j.amarillas} 🟨` : ''}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <footer class="pie">
+      Plantilla y estadísticas leídas de la tabla <i>Players</i> de la página del equipo en
+      Copa Fácil. Verificado: los goles suman {datos.goles_temporada_total}, igual que los
+      goles a favor de Real Betits en la tabla de posiciones.
+    </footer>
+  </main>
+</Base>
+
+<style>
+  .solo {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 34px 24px 70px;
+  }
+
+  .titulo { font-size: 44px; font-weight: 800; color: var(--blanco); }
+  .sub { margin: 4px 0 26px; color: var(--dorado); letter-spacing: 0.04em; font-size: 15px; }
+
+  .nota {
+    margin: 22px 0 0;
+    text-align: center;
+    font-size: 14px;
+    color: rgb(229 225 222 / 0.65);
+  }
+  .nota b { color: var(--dorado-claro); }
+  .nota--chica { font-size: 13px; color: rgb(229 225 222 / 0.5); text-align: left; margin: 0 0 14px; }
+
+  .banca { margin-top: 54px; }
+  .banca h2 {
+    font-size: 26px;
+    color: var(--blanco);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgb(195 147 80 / 0.3);
+    margin-bottom: 16px;
+  }
+
+  .grilla {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 12px;
+  }
+
+  .mini {
+    display: grid; gap: 2px;
+    padding: 12px 14px;
+    border-radius: var(--radio-chico);
+    background: rgb(10 42 26 / 0.45);
+    border: 1px solid rgb(195 147 80 / 0.2);
+  }
+
+  .mini__ini {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    font-family: var(--fuente-display); font-size: 15px; font-weight: 700;
+    color: var(--crema);
+    background: linear-gradient(150deg, rgb(22 87 59 / 0.9), rgb(3 17 10 / 0.9));
+    border: 1px solid rgb(195 147 80 / 0.35);
+    margin-bottom: 4px;
+  }
+  .mini__nombre { font-family: var(--fuente-display); font-size: 17px; font-weight: 600; color: var(--blanco); }
+  .mini__pos { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dorado); }
+  .mini__stats { font-size: 12px; color: rgb(229 225 222 / 0.55); }
+
+  .pie {
+    margin-top: 46px; padding-top: 18px;
+    border-top: 1px solid rgb(195 147 80 / 0.2);
+    font-size: 13px; color: rgb(229 225 222 / 0.45);
+  }
+
+  #medidas {
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    color: var(--crema);
+  }
+</style>
+
+<!--
+  Diagnóstico opcional (?debug=1): mide la caja REAL que ocupa cada carta ya
+  proyectada en 3D, para detectar superposiciones sin adivinar desde una captura.
+-->
+<script>
+  if (new URLSearchParams(location.search).has('debug')) {
+    requestAnimationFrame(() => {
+      const plano = document.querySelector('.cancha__plano');
+      const base = plano.getBoundingClientRect();
+      const filas = [...document.querySelectorAll('.jugador')].map((el) => {
+        const carta = el.firstElementChild.getBoundingClientRect();
+        const nom = el.querySelector('.carta__nombre');
+        return {
+          quien: nom ? nom.textContent.trim() : '?',
+          x: [Math.round(carta.left - base.left), Math.round(carta.right - base.left)],
+          y: [Math.round(carta.top - base.top), Math.round(carta.bottom - base.top)],
+          marco: el.querySelector('.carta__marco'),
+        };
+      });
+      const solapes = [];
+      for (let i = 0; i < filas.length; i++) {
+        for (let j = i + 1; j < filas.length; j++) {
+          const a = filas[i], b = filas[j];
+          const ox = Math.min(a.x[1], b.x[1]) - Math.max(a.x[0], b.x[0]);
+          const oy = Math.min(a.y[1], b.y[1]) - Math.max(a.y[0], b.y[0]);
+          if (ox > 0 && oy > 0) solapes.push(`${a.quien} x ${b.quien}: ${ox}x${oy}px`);
+        }
+      }
+      const desbordes = filas.map((f) => {
+        const m = f.marco;
+        const d = m.scrollHeight - m.clientHeight;
+        return `${f.quien.padEnd(24)} alto ${m.clientHeight} contenido ${m.scrollHeight}` + (d > 1 ? `  DESBORDA ${d}px` : '');
+      });
+      const pre = document.createElement('pre');
+      pre.id = 'medidas';
+      pre.textContent =
+        'PLANO ' + plano.offsetWidth + 'x' + plano.offsetHeight +
+        ' | caja proyectada ' + Math.round(base.width) + 'x' + Math.round(base.height) + '\n' +
+        'VIEWPORT ' + innerWidth + 'x' + innerHeight + '\n' +
+        filas.map((f) => `${f.quien.padEnd(24)} x ${f.x[0]}..${f.x[1]}  y ${f.y[0]}..${f.y[1]}`).join('\n') +
+        '\n--- desborde del contenido de cada carta ---\n' + desbordes.join('\n') +
+        '\nSOLAPES: ' + (solapes.length ? '\n  ' + solapes.join('\n  ') : 'ninguno');
+      document.body.appendChild(pre);
+    });
+  }
+</script>

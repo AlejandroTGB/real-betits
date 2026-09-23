@@ -1,0 +1,62 @@
+---
+/**
+ * Partidos: el partido que viene, la campaña y el camino.
+ *
+ * El orden no es casual: primero QUÉ VIENE (la entrada, lo más importante si
+ * entras el día antes), después CÓMO VAMOS (la campaña, en dos segundos), y
+ * recién al final el DETALLE jornada a jornada para quien quiere todo.
+ *
+ * Como la home, esta página casi no tiene HTML propio: arma tres componentes.
+ */
+import Sitio from '../layouts/Sitio.astro';
+import TicketPartido from '../components/TicketPartido.astro';
+import Campana from '../components/Campana.astro';
+import Camino from '../components/Camino.astro';
+---
+
+<Sitio
+  titulo="Partidos — Real Betits"
+  descripcion="Los partidos de Real Betits en la Zapping Liga Premier, Sábado 2° DIV: resultados, próximos encuentros y el fixture jornada a jornada."
+>
+  <section class="seccion">
+    <header class="seccion__cabecera">
+      <h2 class="seccion__titulo">Partidos</h2>
+    </header>
+
+    <TicketPartido />
+
+    <div class="bloque">
+      <h3 class="bloque__titulo">La campaña</h3>
+      <Campana />
+    </div>
+
+    <div class="bloque">
+      <h3 class="bloque__titulo">El camino</h3>
+      <Camino />
+    </div>
+  </section>
+</Sitio>
+
+<style>
+  .bloque { margin-top: 54px; }
+
+  .bloque__titulo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 18px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dorado);
+  }
+
+  /* el filete que acompaña al título hasta el borde */
+  .bloque__titulo::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgb(195 147 80 / 0.35), transparent);
+  }
+</style>

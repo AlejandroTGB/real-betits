@@ -1,0 +1,67 @@
+---
+/**
+ * Molde de las páginas "de verdad" del sitio: Base + navbar + contenido + pie.
+ *
+ * Diferencia con Base.astro:
+ *   Base  -> el documento HTML pelado (head, fuentes, fondo). Lo usan también
+ *            las páginas de trabajo (/cancha, /estilo).
+ *   Sitio -> Base + la navegación del sitio + el router de transiciones.
+ *
+ * El <ClientRouter /> es lo que hace el fade entre páginas. Cuesta unos pocos
+ * KB de JavaScript y a cambio:
+ *   - el fade funciona también en navegadores viejos (con fallback),
+ *   - el navbar no se re-dibuja en cada cambio (transition:persist).
+ * La alternativa 100% CSS existe (`@view-transition`), pero solo funciona en
+ * navegadores recientes; ahí se degrada a un cambio instantáneo.
+ */
+import { ClientRouter } from 'astro:transitions';
+import Base from './Base.astro';
+import Navbar from '../components/Navbar.astro';
+
+interface Props {
+  titulo: string;
+  descripcion?: string;
+  /**
+   * Pasa al navbar: ocultar el nombre mientras el hero esté en pantalla.
+   * Lo usa la home, donde el hero ya dice el nombre en enorme.
+   */
+  nombreAlScrollear?: boolean;
+}
+const { titulo, descripcion, nombreAlScrollear = false } = Astro.props;
+---
+
+<Base titulo={titulo} descripcion={descripcion}>
+  <ClientRouter slot="head" />
+
+  <Navbar nombreAlScrollear={nombreAlScrollear} />
+
+  <main transition:animate="fade">
+    <slot />
+  </main>
+
+  <footer class="pie">
+    <p>
+      Real Betits · Zapping Liga Premier, Sábado 2° DIV
+      <span>·</span> Datos de la liga vía Copa Fácil
+      <span>·</span> Escudo del Instagram del equipo
+    </p>
+  </footer>
+</Base>
+
+<style>
+  .pie {
+    margin-top: 40px;
+    padding: 26px 24px 34px;
+    border-top: 1px solid rgb(195 147 80 / 0.18);
+    text-align: center;
+  }
+
+  .pie p {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: rgb(229 225 222 / 0.42);
+  }
+
+  .pie span { color: rgb(195 147 80 / 0.45); margin: 0 5px; }
+</style>

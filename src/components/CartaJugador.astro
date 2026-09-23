@@ -1,0 +1,316 @@
+---
+/**
+ * Carta de jugador estilo FIFA Ultimate Team.
+ *
+ * 100% CSS: el efecto hover (inclinación, brillo que barre, resplandor) se hace
+ * con transform + gradientes, sin una línea de JavaScript.
+ *
+ * TAMAÑOS: todo el interior está en `cqw` (unidades de container query), o sea
+ * un % del ancho de la propia carta. Así la carta se ve EXACTAMENTE igual a
+ * 290px que a 146px, sin que el contenido se desborde. Si se usaran píxeles
+ * fijos, en tamaño chico el nombre y los stats se salen de la caja.
+ * La referencia usada para convertir fue la carta a 290px de ancho.
+ *
+ * Cuando lleguen las fotos reales, se pasa `foto` y reemplaza las iniciales.
+ */
+import escudo from '../assets/escudo.png';
+
+interface Props {
+  nombre: string;
+  posicion: string;
+  nota: number;
+  stats: { rit: number; tir: number; pas: number; reg: number; def: number; fis: number };
+  iniciales: string;
+  foto?: string;
+  /** 'titular' = verde/dorado (por defecto) | 'suplente' = más apagada */
+  variante?: 'titular' | 'suplente';
+  /** Fuerza el estado hover sin mouse (para la guía de estilo y capturas) */
+  demo?: boolean;
+}
+
+const { nombre, posicion, nota, stats, iniciales, foto, variante = 'titular', demo = false } = Astro.props;
+const filas = [
+  // En una carta FUT las dos columnas se leen HACIA ABAJO:
+  // izq = RIT, TIR, PAS | der = REG, DEF, FÍS
+  ['RIT', stats.rit, 'REG', stats.reg],
+  ['TIR', stats.tir, 'DEF', stats.def],
+  ['PAS', stats.pas, 'FÍS', stats.fis],
+];
+---
+
+<article class={`carta carta--${variante}${demo ? ' carta--demo' : ''}`}>
+  <div class="carta__marco">
+    <div class="carta__rayos" aria-hidden="true"></div>
+
+    <header class="carta__cabeza">
+      <div class="carta__nota">
+        <span class="carta__num">{nota}</span>
+        <span class="carta__pos">{posicion}</span>
+      </div>
+      <img class="carta__escudo" src={escudo.src} alt="Real Betits" width="44" height="65" />
+    </header>
+
+    <div class="carta__retrato">
+      {foto ? <img src={foto} alt={nombre} /> : <span class="carta__iniciales">{iniciales}</span>}
+    </div>
+
+    <h3 class="carta__nombre">{nombre}</h3>
+
+    <ul class="carta__stats">
+      {filas.map(([l1, v1, l2, v2]) => (
+        <li>
+          <span class="carta__stat"><b>{v1}</b> {l1}</span>
+          <span class="carta__stat"><b>{v2}</b> {l2}</span>
+        </li>
+      ))}
+    </ul>
+
+    <span class="carta__brillo" aria-hidden="true"></span>
+  </div>
+</article>
+
+<style>
+  .carta {
+    /* el punto de vista para el efecto 3D */
+    perspective: 900px;
+    width: 100%;
+    max-width: 290px;
+    /* el contenedor que define a qué se refiere 1cqw */
+    container-type: inline-size;
+  }
+
+  .carta__marco {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 3 / 4.15;
+    padding: 4.83cqw 5.52cqw 5.52cqw;
+    border-radius: 6.2cqw;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+      radial-gradient(120% 75% at 50% 12%, rgb(31 122 82 / 0.5), transparent 62%),
+      linear-gradient(165deg, var(--verde-800) 0%, var(--verde-900) 45%, var(--verde-950) 100%);
+    box-shadow: var(--sombra);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.45s ease;
+  }
+
+  /* marco dorado interior */
+  .carta__marco::before {
+    content: '';
+    position: absolute;
+    inset: 2.41cqw;
+    border: 1px solid rgb(195 147 80 / 0.45);
+    border-radius: 3.8cqw;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .carta--suplente .carta__marco {
+    /* claramente más apagada que la titular */
+    filter: saturate(0.28) brightness(0.72) contrast(0.92);
+    opacity: 0.9;
+  }
+
+  /* --- rayos detrás del retrato --- */
+  .carta__rayos {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    /* rayos: un patrón de 12° repetido en círculo, difuminado con una máscara radial */
+    background: repeating-conic-gradient(
+      from 0deg at 50% 40%,
+      transparent 0deg 9deg,
+      rgb(195 147 80 / 0.18) 9deg 12deg
+    );
+    -webkit-mask-image: radial-gradient(62% 52% at 50% 42%, #000 20%, transparent 78%);
+    mask-image: radial-gradient(62% 52% at 50% 42%, #000 20%, transparent 78%);
+    opacity: 0.7;
+    transition: opacity 0.45s ease, transform 0.6s ease;
+  }
+
+  /* --- cabecera: nota + posición + escudo --- */
+  .carta__cabeza {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2.76cqw;
+  }
+
+  .carta__nota {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--fuente-display);
+    line-height: 0.86;
+  }
+
+  .carta__num {
+    font-size: 13.1cqw;
+    font-weight: 800;
+    color: var(--dorado-claro);
+    text-shadow: 0 2px 10px rgb(0 0 0 / 0.5);
+  }
+
+  .carta__pos {
+    margin-top: 0.69cqw;
+    font-size: 4.48cqw;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--dorado);
+  }
+
+  .carta__escudo {
+    width: 13.1cqw;
+    height: auto;
+    filter: drop-shadow(0 3px 8px rgb(0 0 0 / 0.55));
+  }
+
+  /* --- retrato --- */
+  .carta__retrato {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    margin: 1.38cqw 0;
+  }
+
+  .carta__retrato img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.5));
+  }
+
+  /* placeholder mientras no hay foto: iniciales en un disco */
+  .carta__iniciales {
+    display: grid;
+    place-items: center;
+    width: 37.24cqw;
+    height: 37.24cqw;
+    border-radius: 50%;
+    font-family: var(--fuente-display);
+    font-size: 15.17cqw;
+    font-weight: 700;
+    color: var(--crema);
+    background: linear-gradient(150deg, rgb(22 87 59 / 0.9), rgb(3 17 10 / 0.9));
+    border: 1px solid rgb(195 147 80 / 0.4);
+    box-shadow: inset 0 0 24px rgb(0 0 0 / 0.5);
+  }
+
+  /* --- nombre --- */
+  .carta__nombre {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    font-size: 8.62cqw;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding-bottom: 2.41cqw;
+    border-bottom: 1px solid rgb(195 147 80 / 0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* --- stats --- */
+  .carta__stats {
+    position: relative;
+    z-index: 2;
+    list-style: none;
+    margin: 2.76cqw 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.03cqw;
+    font-family: var(--fuente-display);
+  }
+
+  .carta__stats li {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.45cqw;
+  }
+
+  /* separador vertical entre las dos columnas de stats */
+  .carta__stat:first-child {
+    border-right: 1px solid rgb(195 147 80 / 0.25);
+    padding-right: 3.45cqw;
+  }
+
+  .carta__stat {
+    display: flex;
+    align-items: baseline;
+    gap: 1.72cqw;
+    font-size: 5.17cqw;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--crema);
+  }
+
+  .carta__stat b {
+    font-size: 6.55cqw;
+    font-weight: 800;
+    color: var(--blanco);
+    min-width: 7.59cqw;
+  }
+
+  /* --- barrido de brillo (el "efecto espectacular") --- */
+  .carta__brillo {
+    position: absolute;
+    top: -60%;
+    left: -120%;
+    width: 80%;
+    height: 220%;
+    z-index: 4;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.06) 30%,
+      rgb(255 255 255 / 0.42) 50%,
+      rgb(255 255 255 / 0.06) 70%,
+      transparent 100%
+    );
+    transform: rotate(14deg);
+    transition: left 0.75s cubic-bezier(0.3, 0.9, 0.2, 1);
+  }
+
+  /* --- estados hover / focus ---
+     `.carta--demo` fuerza el estado sin mouse: sirve para la guía de estilo
+     y para capturas, donde no se puede hacer hover. */
+  .carta:hover .carta__marco,
+  .carta:focus-within .carta__marco,
+  .carta--demo .carta__marco {
+    /* Sin `scale()` a propósito: escalar por transform pixela el texto.
+       El crecimiento lo maneja el contenedor animando su ancho. */
+    transform: rotateX(7deg) rotateY(-9deg) translateY(-8px);
+    box-shadow: var(--sombra-dorada);
+  }
+
+  .carta:hover .carta__brillo,
+  .carta:focus-within .carta__brillo,
+  .carta--demo .carta__brillo {
+    left: 140%;
+  }
+
+  .carta:hover .carta__rayos,
+  .carta:focus-within .carta__rayos,
+  .carta--demo .carta__rayos {
+    opacity: 1;
+    transform: rotate(12deg) scale(1.12);
+  }
+
+  /* respeta a quien prefiere menos movimiento */
+  @media (prefers-reduced-motion: reduce) {
+    .carta__marco,
+    .carta__brillo,
+    .carta__rayos { transition: none; }
+    .carta:hover .carta__marco { transform: none; }
+  }
+</style>

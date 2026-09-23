@@ -1,0 +1,27 @@
+{
+  "equipo": "REAL BETITS",
+  "division": "Zapping Liga Premier · Sábado 2° DIV",
+  "fuente": "Tabla 'Players' de la página del equipo en copafacil.com (leída del árbol de accesibilidad de la app Flutter)",
+  "nota_automatizacion": "OJO: la plantilla NO se puede sacar por la API REST pública — el nodo `insc` de Firebase responde 403/401. A diferencia del fixture y la tabla (que sí se automatizan con scripts/extraer-liga.py), esta lista hay que mantenerla a mano.",
+  "stats_nota": "Los stats de las cartas están fijados en 67 para todos, a propósito, hasta que el equipo decida cómo se calculan.",
+  "goles_temporada_total": 7,
+  "campos_stats": ["goles", "partidos", "amarillas", "rojas", "faltas", "asistencias"],
+  "jugadores": [
+    { "nombre": "Jose Ignacio Pineda (A)", "posicion": "arquero",   "partidos": 2, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Diego Toledo",            "posicion": "defensa",   "partidos": 2, "goles": 1, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Francisco Pizarro",       "posicion": "defensa",   "partidos": 2, "goles": 3, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "José García",             "posicion": "defensa",   "partidos": 2, "goles": 0, "amarillas": 1, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Juan Ignacio Beltran",    "posicion": "defensa",   "partidos": 2, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Matías Garín",            "posicion": "defensa",   "partidos": 2, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Pablo García",            "posicion": "defensa",   "partidos": 2, "goles": 0, "amarillas": 2, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Eduardo Beltrán",         "posicion": "defensa",   "partidos": 1, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Nicolas Pinto",           "posicion": "defensa",   "partidos": 1, "goles": 1, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Alejandro Torres",        "posicion": "medio",     "partidos": 2, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Cristóbal Zecchetto",     "posicion": "medio",     "partidos": 2, "goles": 1, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Arturo Beltrán",          "posicion": "medio",     "partidos": 1, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Roberto Fica",            "posicion": "delantero", "partidos": 1, "goles": 1, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Agustin Pizarro",         "posicion": "",          "partidos": 1, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Joaquin Romero",          "posicion": "",          "partidos": 0, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 },
+    { "nombre": "Maximiliano Cruz",        "posicion": "",          "partidos": 0, "goles": 0, "amarillas": 0, "rojas": 0, "faltas": 0, "asistencias": 0 }
+  ]
+}

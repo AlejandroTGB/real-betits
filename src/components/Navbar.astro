@@ -1,0 +1,308 @@
+---
+/**
+ * Barra de navegación.
+ *
+ * - Arranca TRANSPARENTE sobre el hero y se vuelve sólida al bajar el scroll.
+ * - `nombreAlScrollear`: en la home el hero ya dice "REAL BETITS" en enorme, así
+ *   que repetirlo en el navbar era ruido. Con esta opción el navbar arranca con
+ *   SOLO el escudo y recupera el nombre cuando el hero queda atrás. Nunca se ve
+ *   el nombre dos veces en el mismo vistazo, y nunca desaparece del todo.
+ *   En páginas sin hero, el nombre se ve siempre.
+ * - Los enlaces a secciones que todavía no existen van apagados con "pronto",
+ *   para que el navbar se vea completo sin llevar a páginas vacías.
+ * - En celular se abre un menú con el atributo `popover` de HTML (sin JS propio).
+ * - `transition:persist` hace que el navbar NO se destruya al cambiar de página:
+ *   por eso no parpadea con el fade.
+ */
+import escudo from '../assets/escudo.png';
+
+interface Props {
+  /** Ocultar el nombre mientras el hero esté en pantalla. */
+  nombreAlScrollear?: boolean;
+}
+const { nombreAlScrollear = false } = Astro.props;
+
+const enlaces = [
+  { texto: 'Formación', href: '/', pronto: false },
+  { texto: 'Partidos', href: '/partidos', pronto: false },
+  { texto: 'Tabla', href: '/tabla', pronto: true },
+  { texto: 'Galería', href: '/galeria', pronto: true },
+];
+
+const ruta = (Astro.url.pathname.replace(/\/+$/, '') || '/');
+const esActivo = (href: string) => ruta === href;
+---
+
+<header
+  class:list={['navbar', { 'navbar--inicio': nombreAlScrollear }]}
+  data-nombre-scroll={nombreAlScrollear ? '' : undefined}
+  transition:persist="navbar"
+>
+  <div class="navbar__interior">
+    <a class="navbar__marca" href="/">
+      <img src={escudo.src} alt="" width="34" height="50" />
+      <span class="navbar__nombre">Real Betits</span>
+    </a>
+
+    <!-- escritorio -->
+    <nav class="navbar__links" aria-label="Secciones">
+      {enlaces.map((e) =>
+        e.pronto ? (
+          <span class="navbar__link navbar__link--pronto" aria-disabled="true">
+            {e.texto}<i>pronto</i>
+          </span>
+        ) : (
+          <a
+            class:list={['navbar__link', { 'navbar__link--activo': esActivo(e.href) }]}
+            href={e.href}
+            aria-current={esActivo(e.href) ? 'page' : undefined}
+          >
+            {e.texto}
+          </a>
+        )
+      )}
+    </nav>
+
+    <!-- celular -->
+    <button class="navbar__burger" popovertarget="menu-movil" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div id="menu-movil" popover class="navbar__menu">
+    <nav aria-label="Secciones">
+      {enlaces.map((e) =>
+        e.pronto ? (
+          <span class="navbar__menu-link navbar__link--pronto" aria-disabled="true">
+            {e.texto}<i>pronto</i>
+          </span>
+        ) : (
+          <a
+            class:list={['navbar__menu-link', { 'navbar__link--activo': esActivo(e.href) }]}
+            href={e.href}
+          >
+            {e.texto}
+          </a>
+        )
+      )}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+  }
+
+  /* estado sólido al bajar (la clase la pone el script de abajo) */
+  .navbar--solida {
+    background: rgb(3 17 10 / 0.82);
+    border-bottom-color: rgb(195 147 80 / 0.28);
+    backdrop-filter: blur(10px) saturate(1.2);
+  }
+
+  .navbar__interior {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .navbar__marca {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+  }
+  .navbar__marca img {
+    height: 40px;
+    width: auto;
+    filter: drop-shadow(0 3px 10px rgb(0 0 0 / 0.6));
+  }
+
+  .navbar__nombre {
+    font-family: var(--fuente-display);
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--blanco);
+    white-space: nowrap;
+    transition: opacity 0.32s ease, transform 0.32s ease;
+  }
+
+  /* Estado inicial de la home: solo el escudo, porque el hero ya dice el nombre
+     en enorme. Se oculta con opacity (no con display) a propósito: así el hueco
+     queda reservado y el navbar no se reacomoda cuando el nombre aparece. */
+  .navbar--inicio .navbar__nombre {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  .navbar__links {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+  }
+
+  .navbar__link {
+    position: relative;
+    font-family: var(--fuente-display);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgb(229 225 222 / 0.72);
+    padding: 6px 2px;
+    transition: color 0.25s ease;
+  }
+
+  .navbar__link:hover { color: var(--blanco); }
+
+  /* el subrayado dorado del link activo */
+  .navbar__link--activo { color: var(--dorado-claro); }
+  .navbar__link--activo::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--dorado);
+    border-radius: 2px;
+  }
+
+  /* enlaces apagados: se pueden ver, no se pueden clickear */
+  .navbar__link--pronto {
+    color: rgb(229 225 222 / 0.3);
+    cursor: not-allowed;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .navbar__link--pronto i {
+    font-family: var(--fuente-texto);
+    font-size: 9px;
+    font-style: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgb(195 147 80 / 0.6);
+    border: 1px solid rgb(195 147 80 / 0.3);
+    border-radius: 999px;
+    padding: 1px 6px;
+  }
+
+  /* ---------- celular ---------- */
+  .navbar__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 38px;
+    padding: 0 9px;
+    background: transparent;
+    border: 1px solid rgb(195 147 80 / 0.4);
+    border-radius: 9px;
+    cursor: pointer;
+  }
+  .navbar__burger span {
+    display: block;
+    height: 2px;
+    background: var(--crema);
+    border-radius: 2px;
+  }
+
+  .navbar__menu {
+    /* el popover vive en la capa superior: hay que ubicarlo a mano */
+    position: fixed;
+    inset: 62px 0 auto 0;
+    margin: 0;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    padding: 10px 24px 20px;
+    background: rgb(4 22 13 / 0.97);
+    border-bottom: 1px solid rgb(195 147 80 / 0.3);
+  }
+  .navbar__menu:not(:popover-open) { display: none; }
+  .navbar__menu::backdrop { background: rgb(3 17 10 / 0.6); }
+
+  .navbar__menu nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .navbar__menu-link {
+    font-family: var(--fuente-display);
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgb(229 225 222 / 0.8);
+    padding: 11px 4px;
+    border-bottom: 1px solid rgb(195 147 80 / 0.12);
+  }
+  .navbar__menu-link.navbar__link--activo { color: var(--dorado-claro); }
+
+  @media (max-width: 760px) {
+    .navbar__links { display: none; }
+    .navbar__burger { display: flex; }
+  }
+</style>
+
+<script>
+  /**
+   * Lo ÚNICO con JavaScript del navbar: saber en qué punto del scroll está la
+   * página. Son unas pocas líneas y no hay forma confiable de hacerlo en CSS
+   * puro en todos los navegadores.
+   *
+   * Hace dos cosas:
+   *   1. transparente -> sólida (a los 40px)
+   *   2. ocultar/mostrar el nombre, para no repetirlo junto al hero
+   *
+   * Como el navbar es persistente entre páginas, el listener se registra una
+   * sola vez y se reutiliza.
+   */
+  let enlazado = false;
+
+  function revisarScroll() {
+    const nav = document.querySelector('.navbar');
+    if (!nav) return;
+
+    nav.classList.toggle('navbar--solida', window.scrollY > 40);
+
+    // El nombre solo se gestiona donde la página lo pidió (data-nombre-scroll).
+    // Aparece cuando el hero ya quedó atrás del todo: así el nombre nunca se ve
+    // dos veces en el mismo vistazo (hero + navbar). En páginas sin hero se ve
+    // siempre, porque heroAtras queda en true.
+    if (nav.hasAttribute('data-nombre-scroll')) {
+      const hero = document.querySelector('.hero');
+      const heroAtras = !hero || hero.getBoundingClientRect().bottom <= nav.offsetHeight;
+      nav.classList.toggle('navbar--inicio', !heroAtras);
+    }
+  }
+
+  function iniciarNavbar() {
+    revisarScroll();
+    if (!enlazado) {
+      window.addEventListener('scroll', revisarScroll, { passive: true });
+      window.addEventListener('resize', revisarScroll, { passive: true });
+      enlazado = true;
+    }
+  }
+
+  iniciarNavbar();
+  document.addEventListener('astro:page-load', iniciarNavbar);
+</script>
