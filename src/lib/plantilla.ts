@@ -105,3 +105,26 @@ export const PLANTEL_ORDENADO = [...PLANTEL].sort(
 export const BANCA_ORDENADA = PLANTEL_ORDENADO.filter(
   (j) => !ES_TITULAR.has(j.nombre)
 );
+
+/**
+ * Goleadores del equipo, de mayor a menor.
+ *
+ * ⚠️ Son goles del TORNEO, no por partido. La API de la liga NO tiene goleadores
+ * por partido: se revisaron sus 178 partidos y los 13 campos de cada uno, y
+ * ninguno los trae. Esto sale de la columna de stats de la plantilla en la app
+ * de Copa Fácil, y cuadra con nuestros goles a favor en la tabla (7).
+ *
+ * Los empates se ordenan por nombre para que el orden sea estable entre
+ * compilaciones (si no, dos con los mismos goles podrían intercambiarse).
+ */
+export const GOLEADORES = PLANTEL
+  .filter((j) => j.goles > 0)
+  .sort((a, b) => b.goles - a.goles || a.nombre.localeCompare(b.nombre, 'es'));
+
+/**
+ * Goles a favor de todo el equipo, sumando la plantilla.
+ *
+ * Sirve de control contra la tabla de la liga: si algún día no cuadra con los
+ * `gf` de nuestra fila, hay un dato malo en alguna de las dos fuentes.
+ */
+export const GOLES_TOTAL = PLANTEL.reduce((suma, j) => suma + j.goles, 0);

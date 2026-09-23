@@ -37,26 +37,5 @@ import Camino from '../components/Camino.astro';
   </section>
 </Sitio>
 
-<style>
-  .bloque { margin-top: 54px; }
-
-  .bloque__titulo {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 0 0 18px;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--dorado);
-  }
-
-  /* el filete que acompaña al título hasta el borde */
-  .bloque__titulo::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, rgb(195 147 80 / 0.35), transparent);
-  }
-</style>
+<!-- Los estilos del título de bloque (.bloque / .bloque__titulo) viven en
+     global.css: los usan también Tabla y Galería. -->

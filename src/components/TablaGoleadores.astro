@@ -1,0 +1,68 @@
+---
+/**
+ * Tabla de goleadores del equipo.
+ *
+ * Formato de toda la vida: jugador a la izquierda, puesto al medio, goles a la
+ * derecha. Sin columna de equipo porque son todos nuestros.
+ *
+ * ⚠️ Son goles del TORNEO, no por partido: la API de la liga no tiene goleadores
+ * por partido. Ver el aviso largo en lib/plantilla.ts.
+ *
+ * Usa la base de `.tabla` que vive en global.css, la MISMA que la tabla de
+ * posiciones — por eso las dos se ven iguales sin copiar estilos.
+ */
+import { GOLEADORES, GOLES_TOTAL, etiquetaPosicion } from '../lib/plantilla';
+---
+
+<div class="tabla-envoltura">
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th class="tabla__eq" scope="col">Jugador</th>
+        <th class="tabla__c" scope="col">Puesto</th>
+        <th class="tabla__c tabla__num" scope="col">G</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        GOLEADORES.map((j) => (
+          <tr class="tabla__fila">
+            <td class="tabla__eq">{j.nombre}</td>
+            <td class="tabla__c">
+              <span class="gol__pos">{etiquetaPosicion(j.posicion)}</span>
+            </td>
+            <td class="tabla__c tabla__num">{j.goles}</td>
+          </tr>
+        ))
+      }
+      {/* El total no es adorno: tiene que cuadrar con los goles a favor de la
+          tabla de posiciones. Si algún día no cuadra, hay un dato malo. */}
+      <tr class="tabla__fila gol__total">
+        <td class="tabla__eq" colspan="2">Total del equipo</td>
+        <td class="tabla__c tabla__num">{GOLES_TOTAL}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .gol__pos {
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    color: rgb(229 225 222 / 0.5);
+  }
+
+  /* el total, callado: cierra la tabla sin competir con los goleadores */
+  .gol__total td {
+    border-bottom: none;
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(229 225 222 / 0.45);
+  }
+
+  .gol__total .tabla__num {
+    font-size: 15px;
+    color: rgb(229 225 222 / 0.6);
+  }
+</style>

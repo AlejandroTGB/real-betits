@@ -95,6 +95,111 @@ a { color: var(--dorado); }
   color: var(--dorado);
 }
 
+/* --- Bloques con título, dentro de una sección ---------------------------- */
+
+.bloque { margin-top: 54px; }
+
+.bloque__titulo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dorado);
+}
+
+/* el filete que acompaña al título hasta el borde */
+.bloque__titulo::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgb(195 147 80 / 0.35), transparent);
+}
+
+/* ==========================================================================
+   Tablas: la base que comparten la de posiciones y la de goleadores.
+
+   Va acá para que las dos se vean iguales POR CONSTRUCCIÓN y no por copiar y
+   pegar: si cada componente tuviera su copia, tarde o temprano una queda
+   distinta de la otra. Cada componente agrega encima solo lo suyo (el escudo,
+   el PTS, el DIF, la fila propia...).
+   ========================================================================== */
+
+.tabla-envoltura {
+  /* la tabla puede ser más ancha que el celular: se desplaza sola */
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  /* los números alineados en columna, no bailando según el dígito */
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla th,
+.tabla td {
+  padding: 13px 10px;
+  white-space: nowrap;
+}
+
+/* Encabezados en la condensada, que es la tipografía del deporte. El dorado en
+   la última columna avisa dónde está el número que importa sin decir nada. */
+.tabla thead th {
+  padding-top: 0;
+  padding-bottom: 11px;
+  font-family: var(--fuente-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: rgb(229 225 222 / 0.42);
+  border-bottom: 1px solid rgb(195 147 80 / 0.3);
+}
+
+.tabla thead th.tabla__num { color: var(--dorado); }
+
+/* Nombres de equipo: condensada y en mayúsculas, como en cualquier tabla de
+   liga de verdad. Es lo que la hace ver de fútbol y no de hoja de cálculo. */
+.tabla__eq {
+  text-align: left;
+  padding-right: 18px;
+  font-family: var(--fuente-display);
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--blanco);
+}
+
+.tabla__c {
+  text-align: center;
+  font-family: var(--fuente-display);
+  font-size: 15.5px;
+}
+
+.tabla__fila td {
+  color: rgb(229 225 222 / 0.6);
+  border-bottom: 1px solid rgb(229 225 222 / 0.07);
+}
+
+/* la columna de números grandes (PTS en posiciones, G en goleadores) */
+.tabla__num {
+  font-family: var(--fuente-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dorado-claro);
+}
+
+@media (max-width: 560px) {
+  .tabla th,
+  .tabla td { padding: 11px 7px; }
+  .tabla__eq { font-size: 15.5px; padding-right: 12px; }
+  .tabla__c { font-size: 14.5px; }
+  .tabla__num { font-size: 17px; }
+}
+
 /* ==========================================================================
    Fade entre páginas (View Transitions).
 
@@ -102,7 +207,16 @@ a { color: var(--dorado); }
    ::view-transition-new = el contenido que llega
    El viejo sube y se desvanece; el nuevo entra desde abajo. Da la sensación
    de "avanzar hacia el contenido" en vez de un simple parpadeo.
+
+   OJO con el navbar: es mobiliario fijo y no tiene por qué viajar con el
+   contenido. Sin nombre propio va dentro de la captura de `root` (la que entra
+   desde abajo), y por eso aparecía "de abajo hacia arriba". Con nombre propio
+   queda fuera de esa captura y se anima por su cuenta.
    ========================================================================== */
+
+.navbar {
+  view-transition-name: navbar;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root) {
@@ -111,6 +225,17 @@ a { color: var(--dorado); }
   ::view-transition-new(root) {
     animation: 300ms cubic-bezier(0.22, 1, 0.36, 1) both entrada;
   }
+}
+
+/* El navbar se queda clavado donde está: la captura vieja se esconde de una y la
+   nueva aparece sin animación. El contenido sí conserva su movimiento. */
+::view-transition-old(navbar) {
+  animation: none;
+  opacity: 0;
+}
+
+::view-transition-new(navbar) {
+  animation: none;
 }
 
 @keyframes salida {

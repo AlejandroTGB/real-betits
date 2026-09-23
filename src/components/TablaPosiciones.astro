@@ -49,7 +49,7 @@ const conSigno = (n: number) => (n > 0 ? `+${n}` : String(n));
       <tr>
         <th class="tabla__eq" scope="col">Equipo</th>
         {COLUMNAS.map((k) => <th class="tabla__c" scope="col">{SIGLAS[k]}</th>)}
-        <th class="tabla__c tabla__pts" scope="col">PTS</th>
+        <th class="tabla__c tabla__num" scope="col">PTS</th>
       </tr>
     </thead>
     <tbody>
@@ -63,11 +63,17 @@ const conSigno = (n: number) => (n > 0 ? `+${n}` : String(n));
               {esMia(f) ? 'Real Betits' : f.equipo}
             </td>
             {COLUMNAS.map((k) => (
-              <td class:list={['tabla__c', k === 'gd' && 'tabla__dif']}>
+              <td
+                class:list={[
+                  'tabla__c',
+                  k === 'gd' && f.gd > 0 && 'tabla__dif--pos',
+                  k === 'gd' && f.gd < 0 && 'tabla__dif--neg',
+                ]}
+              >
                 {k === 'gd' ? conSigno(f.gd) : f[k]}
               </td>
             ))}
-            <td class="tabla__c tabla__pts">{f.pts}</td>
+            <td class="tabla__c tabla__num">{f.pts}</td>
           </tr>
         ))
       }
@@ -76,71 +82,35 @@ const conSigno = (n: number) => (n > 0 ? `+${n}` : String(n));
 </div>
 
 <style>
-  /* la tabla puede ser más ancha que el celular: se desplaza sola */
-  .tabla-envoltura {
-    overflow-x: auto;
-  }
+  /* La base de la tabla NO va acá: vive en global.css y la comparten la tabla de
+     posiciones y la de goleadores. Acá queda solo lo propio de esta. */
 
-  .tabla {
-    width: 100%;
-    border-collapse: collapse;
-    /* los números alineados en columna, no bailando según el dígito */
-    font-variant-numeric: tabular-nums;
-  }
-
-  .tabla th,
-  .tabla td {
-    padding: 11px 9px;
-    white-space: nowrap;
-  }
-
-  .tabla thead th {
-    padding-top: 0;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: rgb(229 225 222 / 0.4);
-    border-bottom: 1px solid rgb(229 225 222 / 0.14);
-  }
-
-  .tabla__c { text-align: center; }
-  .tabla__eq { text-align: left; }
-
-  .tabla__fila td {
-    font-size: 14px;
-    color: rgb(229 225 222 / 0.72);
-    border-bottom: 1px solid rgb(229 225 222 / 0.06);
-  }
-
-  /* nuestra fila: fondo tenue, sin barras ni filetes de color */
+  /* Nuestra fila: fondo dorado, nombre dorado y el PTS más grande. Sin filetes
+     de color a los costados — se probaron y se veían de más. */
   .tabla__fila--mia td {
-    background: rgb(195 147 80 / 0.1);
-    color: var(--blanco);
-    font-weight: 600;
+    background: rgb(195 147 80 / 0.15);
+    border-bottom-color: rgb(195 147 80 / 0.32);
   }
+
+  .tabla__fila--mia .tabla__eq,
+  .tabla__fila--mia td.tabla__num {
+    color: var(--dorado-claro);
+    font-weight: 700;
+  }
+
+  .tabla__fila--mia td.tabla__num { font-size: 22px; }
 
   .tabla__escudo {
-    width: 18px;
-    height: 26px;
+    width: 20px;
+    height: 29px;
     object-fit: contain;
-    vertical-align: -7px;
-    margin-right: 8px;
+    vertical-align: -8px;
+    margin-right: 9px;
   }
 
-  .tabla__dif { color: rgb(229 225 222 / 0.5); }
-
-  .tabla__pts {
-    font-family: var(--fuente-display);
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--dorado-claro);
-  }
-
-  .tabla__fila--mia .tabla__pts { font-size: 19px; }
-
-  @media (max-width: 560px) {
-    .tabla th,
-    .tabla td { padding: 10px 6px; }
-    .tabla__fila td { font-size: 13px; }
-  }
+  /* La diferencia de gol dice si el equipo está arriba o abajo del cero: acá el
+     color es información, no adorno. El 0 se queda sin color, porque no es ni
+     una cosa ni la otra. */
+  .tabla__dif--pos { color: var(--verde-brillo); }
+  .tabla__dif--neg { color: #c0554f; }
 </style>

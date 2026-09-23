@@ -188,3 +188,32 @@ export function filaDe(equipo: string) {
 export function miFila() {
   return filaDe(MI_EQUIPO);
 }
+
+/**
+ * Los grupos de la división, cada uno con sus 6 equipos.
+ *
+ * Dos decisiones que importan:
+ *
+ * 1. Se ordena por `pos` y no por el orden del archivo. La tabla no tiene
+ *    columna de posición (a propósito), así que EL ORDEN ES la información: no
+ *    puede depender de cómo venga el JSON.
+ * 2. Nuestro grupo va primero, para no hacer buscar la fila propia entre dos
+ *    tablas.
+ */
+export interface Grupo {
+  /** 'A' o 'B', como los nombra la liga. */
+  nombre: string;
+  /** ¿Es el grupo de Real Betits? */
+  esNuestro: boolean;
+  filas: (FilaTabla & { grupo: string })[];
+}
+
+export const GRUPOS: Grupo[] = Object.entries(TABLA)
+  .map(([nombre, filas]) => ({
+    nombre,
+    esNuestro: filas.some((f) => f.equipo === MI_EQUIPO),
+    filas: [...filas]
+      .sort((a, b) => a.pos - b.pos)
+      .map((f) => ({ ...f, grupo: nombre })),
+  }))
+  .sort((a, b) => Number(b.esNuestro) - Number(a.esNuestro));

@@ -12,7 +12,9 @@
  *   para que el navbar se vea completo sin llevar a páginas vacías.
  * - En celular se abre un menú con el atributo `popover` de HTML (sin JS propio).
  * - `transition:persist` hace que el navbar NO se destruya al cambiar de página:
- *   por eso no parpadea con el fade.
+ *   por eso no parpadea con el fade. El precio es que la clase de "activo" que
+ *   renderiza el servidor se queda pegada a la página donde entraste, así que el
+ *   script de abajo la recalcula en cada navegación.
  */
 import escudo from '../assets/escudo.png';
 
@@ -25,7 +27,7 @@ const { nombreAlScrollear = false } = Astro.props;
 const enlaces = [
   { texto: 'Formación', href: '/', pronto: false },
   { texto: 'Partidos', href: '/partidos', pronto: false },
-  { texto: 'Tabla', href: '/tabla', pronto: true },
+  { texto: 'Tabla', href: '/tabla', pronto: false },
   { texto: 'Galería', href: '/galeria', pronto: true },
 ];
 
@@ -80,6 +82,7 @@ const esActivo = (href: string) => ruta === href;
           <a
             class:list={['navbar__menu-link', { 'navbar__link--activo': esActivo(e.href) }]}
             href={e.href}
+            aria-current={esActivo(e.href) ? 'page' : undefined}
           >
             {e.texto}
           </a>
@@ -201,6 +204,15 @@ const esActivo = (href: string) => ruta === href;
     padding: 1px 6px;
   }
 
+  /* Al cambiar de página el navbar se reutiliza (transition:persist), así que sus
+     cambios de estado se animarían como si fueran de scroll: medido, el nombre
+     entraba deslizándose 8px durante 0.32s JUSTO con el fade de la página, y eso
+     se ve como un tambaleo. Durante el cambio, estado instantáneo. */
+  .navbar--sin-transicion,
+  .navbar--sin-transicion .navbar__nombre,
+  .navbar--sin-transicion .navbar__link,
+  .navbar--sin-transicion .navbar__menu-link { transition: none; }
+
   /* ---------- celular ---------- */
   .navbar__burger {
     display: none;
@@ -294,8 +306,47 @@ const esActivo = (href: string) => ruta === href;
     }
   }
 
+  /**
+   * Marca cuál sección está activa.
+   *
+   * Hace falta en el cliente porque el navbar es persistente: la clase que
+   * renderiza el servidor queda pegada a la página donde entraste. Medido:
+   * entrando a /partidos con un clic desde la home, la URL cambiaba pero seguía
+   * subrayado "Formación".
+   *
+   * Sin JavaScript no se pierde nada: no hay navegación en el cliente, y en una
+   * carga normal el servidor ya dejó la clase correcta.
+   */
+  function marcarActivo() {
+    // mismo cálculo que hace el servidor, para que no puedan discrepar
+    const ruta = location.pathname.replace(/\/+$/, '') || '/';
+    const enlaces = document.querySelectorAll('.navbar__link[href], .navbar__menu-link[href]');
+    enlaces.forEach((a) => {
+      const activo = a.getAttribute('href') === ruta;
+      a.classList.toggle('navbar__link--activo', activo);
+      if (activo) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+  }
+
   function iniciarNavbar() {
+    // En un cambio de página, sin animaciones: el estado final se aplica de una.
+    // Si no, el nombre se desliza y el fondo se desvanece mientras la página hace
+    // el fade, y el conjunto se ve tambaleante. La animación queda para el scroll.
+    const nav = document.querySelector('.navbar');
+    if (nav) nav.classList.add('navbar--sin-transicion');
+
     revisarScroll();
+    marcarActivo();
+
+    if (nav) {
+      // dos cuadros: uno para que el navegador registre el estado nuevo, otro
+      // para devolver la transición. Con uno solo alcanza para el mismo cuadro.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => nav.classList.remove('navbar--sin-transicion'))
+      );
+    }
+
     if (!enlazado) {
       window.addEventListener('scroll', revisarScroll, { passive: true });
       window.addEventListener('resize', revisarScroll, { passive: true });

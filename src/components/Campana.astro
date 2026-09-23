@@ -1,10 +1,13 @@
 ---
 /**
- * La campaña: los 5 partidos de un vistazo, más nuestra línea de la tabla.
+ * La campaña: los 5 partidos de un vistazo.
  *
  * Para qué sirve: en dos segundos saber cómo viene el equipo. Es el patrón que
  * usan las apps de fútbol (una píldora por partido), y funciona porque el color
  * hace el trabajo y el marcador confirma.
+ *
+ * Acá NO va la tabla: nuestra línea de posiciones se fue a la página Tabla, que
+ * es donde uno la busca. Antes estaba acá abajo y sobraba.
  *
  * OJO con los pendientes: no llevan marcador NI letra. Antes decían "L"/"V"
  * (local/visita) y confundía, porque la letra parece un resultado. Además
@@ -16,22 +19,9 @@
  * hay 2 así). Esos caen en `pendiente` a propósito: preferimos no pintar un
  * color que no podemos afirmar.
  */
-import { JORNADAS, resultado, marcadorTexto, fechaCorta, miFila } from '../lib/liga';
-import TablaPosiciones from './TablaPosiciones.astro';
+import { JORNADAS, resultado, marcadorTexto, fechaCorta } from '../lib/liga';
 
 const ROTULO: Record<string, string> = { G: 'Ganado', E: 'Empate', P: 'Perdido' };
-
-/**
- * Nuestra fila de la tabla, tal cual la publica la liga.
- *
- * Se la pasamos a TablaPosiciones como lista de UNO: acá mostramos nuestra línea,
- * y la sección Tabla (más adelante) le pasará las 6 del grupo al MISMO componente.
- *
- * Ojo con la trampa de nombres: en la fila de la liga `d` son EMPATADOS y `l`
- * son PERDIDOS (win/draw/loss). No confundir con la `d` de otras partes del
- * fútbol hispano, donde suele ser derrotas. Ver el aviso en TablaPosiciones.
- */
-const fila = miFila();
 ---
 
 <div class="campana">
@@ -53,10 +43,6 @@ const fila = miFila();
       })
     }
   </ul>
-
-  <div class="campana__tabla">
-    <TablaPosiciones filas={fila ? [fila] : []} />
-  </div>
 </div>
 
 <style>
@@ -147,11 +133,6 @@ const fila = miFila();
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgb(229 225 222 / 0.42);
-  }
-
-  /* la tabla arranca con aire respecto de la tira de píldoras */
-  .campana__tabla {
-    margin-top: 26px;
   }
 
   /* ---------- pantallas angostas: la tira se desplaza ---------- */

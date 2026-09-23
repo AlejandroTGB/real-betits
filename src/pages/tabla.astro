@@ -1,0 +1,55 @@
+---
+/**
+ * Tabla: dónde está Real Betits, dónde están los demás, y quién mete los goles.
+ *
+ * El orden no es casual: primero NUESTRO grupo (que es lo que se viene a ver),
+ * después el otro grupo como contexto del torneo, y al final los goleadores.
+ *
+ * Se muestra la división completa, no solo nuestro grupo: son 12 equipos en dos
+ * grupos de 6, y sin el otro grupo la tabla queda a medias.
+ *
+ * ⚠️ La fuente NO trae ascensos, descensos ni playoffs, así que acá no hay zonas
+ * ni colores por clasificación. No se inventan.
+ */
+import Sitio from '../layouts/Sitio.astro';
+import TablaPosiciones from '../components/TablaPosiciones.astro';
+import TablaGoleadores from '../components/TablaGoleadores.astro';
+import { GRUPOS } from '../lib/liga';
+
+const nuestro = GRUPOS.find((g) => g.esNuestro);
+const otros = GRUPOS.filter((g) => !g.esNuestro);
+---
+
+<Sitio
+  titulo="Tabla — Real Betits"
+  descripcion="La tabla de posiciones de los dos grupos de la Zapping Liga Premier, Sábado 2° DIV, y los goleadores de Real Betits."
+>
+  <section class="seccion">
+    <header class="seccion__cabecera">
+      <h2 class="seccion__titulo">Tabla</h2>
+    </header>
+
+    {
+      nuestro && (
+        <div class="bloque">
+          <h3 class="bloque__titulo">Grupo {nuestro.nombre} · el nuestro</h3>
+          <TablaPosiciones filas={nuestro.filas} />
+        </div>
+      )
+    }
+
+    {
+      otros.map((g) => (
+        <div class="bloque">
+          <h3 class="bloque__titulo">Grupo {g.nombre}</h3>
+          <TablaPosiciones filas={g.filas} />
+        </div>
+      ))
+    }
+
+    <div class="bloque">
+      <h3 class="bloque__titulo">Goleadores</h3>
+      <TablaGoleadores />
+    </div>
+  </section>
+</Sitio>
