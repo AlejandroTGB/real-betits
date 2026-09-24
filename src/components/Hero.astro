@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 /**
  * Hero: el encabezado grande de la home.
  *
@@ -24,7 +25,7 @@ const escudoRival = nombreRival ? escudoDe(nombreRival) : null;
   <div class="hero__brillo" aria-hidden="true"></div>
 
   <div class="hero__contenido">
-    <img class="hero__escudo" src={escudo.src} alt="Escudo de Real Betits" width="120" height="177" />
+    <Image class="hero__escudo" src={escudo} alt="Escudo de Real Betits" widths={[48, 96, 192]} sizes="80px" fetchpriority="high" />
 
     <h1 class="hero__titulo">Real Betits</h1>
 
@@ -43,7 +44,7 @@ const escudoRival = nombreRival ? escudoDe(nombreRival) : null;
 
         <div class="barra__duelo">
           <div class="barra__lado">
-            <img class="barra__escudo" src={escudo.src} alt="" width="46" height="68" />
+            <Image class="barra__escudo" src={escudo} alt="" widths={[48, 96, 192]} sizes="32px" />
             <span class="barra__equipo">Real Betits</span>
           </div>
 

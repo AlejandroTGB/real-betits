@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import CartaJugador from '../components/CartaJugador.astro';
 import CartaHueco from '../components/CartaHueco.astro';
@@ -52,7 +53,7 @@ const titulares = [
 <Base titulo="Guía de estilo — Real Betits">
   <main class="guia">
     <header class="guia__cabecera">
-      <img src={escudo.src} alt="Escudo de Real Betits" width="96" height="142" />
+      <Image src={escudo} alt="Escudo de Real Betits" widths={[48, 96, 192]} sizes="96px" />
       <div>
         <h1>Guía de estilo</h1>
         <p class="guia__sub">Real Betits · Zapping Liga Premier · Sábado 2° DIV</p>

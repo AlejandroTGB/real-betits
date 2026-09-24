@@ -38,6 +38,13 @@ export function slugEquipo(nombre: string): string {
  */
 export const escudoPropio: string = propio.src;
 
+/** El mismo escudo, pero como ASSET de Astro (con sus metadatos).
+ *
+ *  Es lo que necesita <Image> para generar variantes por tamaño: el string de
+ *  arriba sirve para un <img> suelto, pero obliga a bajar el archivo de 384 px
+ *  aunque se muestre a 20 px. */
+export const escudoPropioAsset = propio;
+
 export function escudoDe(nombre: string): string | null {
   const buscado = slugEquipo(nombre);
   // Se prefiere el .webp: el PNG/JPG original se queda en el repo como fuente,

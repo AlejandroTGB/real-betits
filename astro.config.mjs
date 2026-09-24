@@ -11,4 +11,9 @@ export default defineConfig({
 
   // El sitio es 100% estático: no hay servidor, no hay base de datos.
   output: 'static',
+
+  // Al pasar el mouse por un enlace, el router ya trae la pagina siguiente por
+  // atras. Medido: el clic tardaba 63-121 ms en tener la pagina lista; con esto
+  // el HTML ya esta en memoria y solo queda el fade de la transicion.
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
 });

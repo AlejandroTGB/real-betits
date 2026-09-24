@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 /**
  * Carta de jugador estilo FIFA Ultimate Team.
  *
@@ -47,7 +48,7 @@ const filas = [
         <span class="carta__num">{nota}</span>
         <span class="carta__pos">{posicion}</span>
       </div>
-      <img class="carta__escudo" src={escudo.src} alt="Real Betits" width="44" height="65" />
+      <Image class="carta__escudo" src={escudo} alt="Real Betits" widths={[48, 96, 192]} sizes="44px" />
     </header>
 
     <div class="carta__retrato">

@@ -1,4 +1,6 @@
 ---
+import { escudoPropioAsset } from '../lib/escudos';
+import { Image } from 'astro:assets';
 /**
  * El partido que viene, mostrado como una ENTRADA de estadio.
  *
@@ -44,7 +46,7 @@ const escudoRival = r ? escudoDe(r) : null;
         <div class="ticket__choque">
           <div class="ticket__lado">
             {/* el nuestro nunca falta: es local, no depende de la liga */}
-            <img class="ticket__escudo" src={escudoMio} alt="" width="56" height="56" />
+            <Image class="ticket__escudo" src={escudoPropioAsset} alt="" widths={[48, 96, 192]} sizes="56px" />
             <span class="ticket__equipo">Real Betits</span>
           </div>
 

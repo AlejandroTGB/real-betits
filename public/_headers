@@ -1,0 +1,28 @@
+# Cabeceras que Cloudflare Pages aplica al servir el sitio.
+#
+# POR QUE ESTO IMPORTA
+#   Cloudflare sirve TODO con `cache-control: public, max-age=0, must-revalidate`,
+#   incluso los archivos que llevan un hash en el nombre. Eso significa que el
+#   navegador le pregunta de nuevo por cada archivo en CADA visita, aunque el
+#   contenido no pueda haber cambiado nunca.
+#
+#   Un archivo como /_astro/escudo.B8PcDz2p.webp lleva el hash del contenido en
+#   el propio nombre: si el contenido cambia, cambia el nombre. Es imposible que
+#   quede obsoleto, asi que se puede cachear para siempre.
+#
+# MEDIDO
+#   Home: 11 pedidos por visita -> con esto, en la segunda visita solo baja el
+#   HTML. La galeria pasa de 34 pedidos (340 KB de fotos) a ninguno.
+
+# Assets con hash de contenido: cachear un ano y no revalidar jamas.
+/_astro/*
+  Cache-Control: public, max-age=31556952, immutable
+
+# Tipografias: no llevan hash, asi que se versiona el nombre desde el CSS
+# (fuentes.css usa /fuentes/lo-que-sea.woff2?v=N). Al cambiar una fuente hay
+# que subir ese N, o los navegadores que ya la tienen no la van a pedir.
+/fuentes/*
+  Cache-Control: public, max-age=31556952, immutable
+
+# El HTML NO va aca a proposito: cambia en cada deploy y el default de
+# Cloudflare (max-age=0, must-revalidate) es exactamente lo que se quiere.

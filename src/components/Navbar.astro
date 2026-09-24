@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 /**
  * Barra de navegación.
  *
@@ -42,7 +43,7 @@ const esActivo = (href: string) => ruta === href;
 >
   <div class="navbar__interior">
     <a class="navbar__marca" href="/">
-      <img src={escudo.src} alt="" width="34" height="50" />
+      <Image src={escudo} alt="" widths={[48, 96, 192]} sizes="34px" />
       <span class="navbar__nombre">Real Betits</span>
     </a>
 

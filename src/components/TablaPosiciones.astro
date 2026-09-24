@@ -1,4 +1,6 @@
 ---
+import { escudoPropioAsset } from '../lib/escudos';
+import { Image } from 'astro:assets';
 /**
  * La tabla de posiciones, en el formato de toda la vida:
  *
@@ -58,7 +60,7 @@ const conSigno = (n: number) => (n > 0 ? `+${n}` : String(n));
           <tr class:list={['tabla__fila', esMia(f) && 'tabla__fila--mia']}>
             <td class="tabla__eq">
               {esMia(f) && conEscudo && (
-                <img class="tabla__escudo" src={escudoPropio} alt="" width="18" height="26" />
+                <Image class="tabla__escudo" src={escudoPropioAsset} alt="" widths={[48, 96, 192]} sizes="20px" />
               )}
               {esMia(f) ? 'Real Betits' : f.equipo}
             </td>
