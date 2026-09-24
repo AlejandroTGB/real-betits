@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Real Betits — cómo funciona el sitio",
+    "output": "real-betits-arquitectura.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "cadena-automatica",
+        "label": "Lo que pasa solo",
+        "focus": ["action", "script", "data", "build", "pages"],
+        "note": "Los domingos y miércoles el Action corre el script y el sitio se reconstruye sin intervención."
+      },
+      {
+        "id": "trabajo-manual",
+        "label": "Lo que es a mano",
+        "focus": ["drive", "data"],
+        "note": "La plantilla de jugadores y el mapa de carpetas del Drive se editan a mano."
+      }
+    ]
+  },
+  "components": [
+    { "id": "copafacil", "type": "external", "label": "Copa Fácil", "sublabel": "API interna", "pos": [40, 300], "size": [130, 60] },
+    { "id": "script", "type": "backend", "label": "Extracción", "sublabel": "extraer-liga.py", "pos": [250, 300], "size": [130, 60] },
+    { "id": "data", "type": "database", "label": "data/", "sublabel": "liga · escudos · fotos", "pos": [460, 300], "size": [130, 60], "tag": "versionado" },
+    { "id": "build", "type": "backend", "label": "Build", "sublabel": "npm run build", "pos": [670, 300], "size": [130, 60] },
+    { "id": "pages", "type": "cloud", "label": "Cloudflare Pages", "sublabel": "sitio publicado", "pos": [880, 300], "size": [130, 60] },
+    { "id": "navegador", "type": "frontend", "label": "Navegador", "sublabel": "móvil y escritorio", "pos": [1090, 300], "size": [130, 60] },
+    { "id": "action", "type": "cloud", "label": "GitHub Actions", "sublabel": "cron dom + mié", "pos": [250, 120], "size": [130, 60] },
+    { "id": "drive", "type": "external", "label": "Drive del torneo", "sublabel": "fotos por jornada", "pos": [40, 480], "size": [130, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "GitHub Actions · ubuntu-latest", "wraps": ["action", "script"] },
+    { "kind": "region", "label": "Cloudflare · build + CDN", "wraps": ["build", "pages"] }
+  ],
+  "connections": [
+    { "id": "copa-a-script", "from": "copafacil", "to": "script", "label": "tabla, fixture, galería", "variant": "emphasis", "labelDx": 65, "labelDy": 65 },
+    { "id": "drive-a-script", "from": "drive", "to": "script", "label": "fotos por jornada", "variant": "dashed" },
+    { "id": "action-a-script", "from": "action", "to": "script", "label": "ejecuta", "fromSide": "bottom", "toSide": "top", "labelDy": 24 },
+    { "id": "script-a-data", "from": "script", "to": "data", "label": "escribe", "variant": "emphasis" },
+    { "id": "data-a-build", "from": "data", "to": "build", "label": "lee los datos", "variant": "emphasis" },
+    { "id": "build-a-pages", "from": "build", "to": "pages", "label": "publica dist/", "variant": "emphasis" },
+    { "id": "pages-a-navegador", "from": "pages", "to": "navegador", "label": "HTTPS", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "La automatización",
+      "items": [
+        "GitHub Actions corre el script los domingos 01:00 y los miércoles 10:00",
+        "Si hay cambios, commitea y hace push",
+        "Cloudflare Pages reconstruye el sitio con cada push a main"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "El sitio",
+      "items": [
+        "Astro estático, 6 páginas, sin React ni base de datos",
+        "Sin JavaScript en el cliente salvo el router de transiciones",
+        "Fotos y fuentes se optimizan en el build"
+      ]
+    }
+  ]
+}
