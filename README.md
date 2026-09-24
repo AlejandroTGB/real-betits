@@ -26,9 +26,8 @@ Sitio del equipo **Real Betits** — parodia cariñosa del Real Betis — que ju
 | `/tabla` | Posiciones de los dos grupos y la tabla de goleadores |
 | `/galeria` | Las fotos de cada fecha jugada, con visor a pantalla completa |
 | `/estilo` | Guía de estilo: la paleta y las cartas de jugador aisladas |
-| `/cancha` | La formación sola, para iterar el diseño (acepta `?debug=1` para ver superposiciones) |
 
-Las dos últimas son páginas de trabajo, no de contenido.
+La última es una página de trabajo, no de contenido.
 
 ## Stack y decisiones
 
@@ -47,7 +46,7 @@ Las dos últimas son páginas de trabajo, no de contenido.
   <img src="docs/diagramas/real-betits-arquitectura-claro.png" alt="Diagrama: Copa Fácil y el Drive alimentan un script que ejecuta GitHub Actions y escribe en data/, y desde ahí Cloudflare Pages construye y sirve el sitio">
 </picture>
 
-<sub>Diagrama generado con [Archify](https://github.com/tt-a1i/archify) · fuente: [`docs/diagramas/real-betits.architecture.json`](docs/diagramas/real-betits.architecture.json) · versión interactiva: [`real-betits-arquitectura.html`](docs/diagramas/real-betits-arquitectura.html)</sub>
+<sub>Diagrama generado con [Archify](https://github.com/tt-a1i/archify) · fuente: [`docs/diagramas/real-betits.architecture.json`](docs/diagramas/real-betits.architecture.json) · **[abrir el mapa interactivo →](https://real-betits.pages.dev/diagrama/)**</sub>
 
 La cadena, paso a paso:
 
@@ -77,10 +76,10 @@ La cadena, paso a paso:
 | `src/pages/` | Las 6 rutas | código |
 | `src/styles/` | `global.css` (tokens, secciones) y `fuentes.css` (`@font-face`) | código |
 | `src/assets/` | El escudo: PNG fuente y el WebP que se sirve | assets |
-| `public/` | Fuentes `.woff2` subseteadas, favicon y `_headers` | assets |
+| `public/` | Fuentes `.woff2` subseteadas, favicon, `_headers` y el diagrama interactivo | assets |
 | `scripts/` | Extracción de la liga y subseteo de fuentes | herramientas |
 | `.github/workflows/` | El Action del cron | automatización |
-| `docs/` | Capturas y el diagrama (fuente + versión interactiva) | documentación |
+| `docs/` | Capturas y el render del diagrama (PNG + fuente) | documentación |
 
 **Regla:** lo que está en `data/` lo escribe el script. Si editas algo de ahí a mano, el próximo
 domingo se pierde.
@@ -143,25 +142,6 @@ El sitio vive en **Cloudflare Pages**, conectado a este repo:
 
 Un push a `main` — tuyo o del Action — dispara un build nuevo.
 
-## Notas técnicas
-
-Cosas que a primera vista parecen raras y no lo son:
-
-- **Las tipografías son propias y están recortadas.** Barlow Condensed e Inter se sirven desde
-  `public/fuentes/`, subseteadas a los caracteres que el sitio realmente usa: de 228 KB a 115 KB en
-  el repo, y de 114 KB a 61 KB de descarga en el home. Se regeneran con
-  `scripts/subsetear-fuentes.py` después de un build.
-- **El escudo es un WebP de 384 px** (`src/assets/escudo.webp`). El PNG original queda en el repo
-  como fuente, pero no se sirve: pesaba 408 KB y se bajaba dos veces (favicon y cartas).
-- **Los escudos rivales van en WebP de 192 px.** El script los convierte solo cuando baja uno nuevo.
-- **Las fotos se versionan.** Se bajan a 1600 px y Astro genera los tamaños menores en el build; la
-  versión grande solo se descarga al abrir el visor.
-- **`_headers` marca los assets con hash como inmutables** (`max-age=31556952`), mientras el HTML
-  queda en `max-age=0`. Sin eso todo se servía con `must-revalidate` y el navegador revalidaba
-  hasta las imágenes que nunca cambian.
-- **`srcset` en todos los usos del escudo.** Si uno solo queda con el archivo grande, el home lo
-  baja igual.
-
 ## Rendimiento
 
 Medido el 24 de septiembre de 2026 con Lighthouse (4G simulado y CPU 4× más lenta) sobre el sitio
@@ -190,13 +170,3 @@ antes de navegar. Ninguna de las dos versiones descarga JavaScript de framework.
 - **Esto es una parodia y no tiene ninguna relación con el Real Betis Balompié.** El nombre
   "REAL BETITS" está escrito así a propósito.
 
-## Pendientes conocidos
-
-- Los **stats de las cartas están todos en 67** hasta que definamos cómo se calculan.
-- **Faltan fotos de los jugadores**: las cartas muestran iniciales.
-- **4 equipos no tienen escudo** en el servidor de la liga (responde 404): Deportivo Resaca, BPC FC,
-  BÁRBAROS y COLGATE. Cuando lo suban, el Action lo baja solo.
-- La liga todavía **no publica ascensos, descensos ni playoffs**, así que la tabla no tiene zonas por
-  clasificación. No se inventan.
-- `robots.txt` no existe y Cloudflare devuelve el HTML del home en su lugar (38 errores para
-  Lighthouse).
