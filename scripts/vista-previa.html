@@ -1,0 +1,212 @@
+<!doctype html>
+<!--
+  Generador de la vista previa para redes (og:image).
+
+  POR QUE EXISTE COMO HTML Y NO COMO SCRIPT
+    No es una captura del sitio: es una pieza de marca. Escrita como HTML se
+    reusa lo que ya tiene el proyecto —los tokens de color, las fuentes
+    subseteadas y el escudo— y se puede retocar en el navegador sin inventar
+    una herramienta nueva.
+
+  COMO SE REGENERA
+    1. Servir la raiz del repo (las rutas de abajo son relativas a /scripts/):
+         python3 ~/herramientas/servir_con_headers.py . --puerto 4401
+    2. Abrir http://127.0.0.1:4401/scripts/vista-previa.html en una ventana de
+       1200x630 y capturar el viewport -> public/og.png
+    3. Comprobar que el PNG mide 1200x630 y pesa menos de 300 KB (WhatsApp y
+       Facebook descartan las imagenes grandes).
+
+  QUE NO DEBE LLEVAR
+    Datos que cambian: ni el proximo partido, ni el marcador, ni la posicion en
+    la tabla. La imagen la cachean las redes durante semanas, asi que un dato
+    vivo se vuelve mentira. Por eso lleva el nombre, la liga y la direccion.
+-->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Vista previa 1200x630</title>
+    <style>
+      @font-face {
+        font-family: 'Barlow Condensed';
+        src: url('../public/fuentes/barlow-condensed-600.woff2') format('woff2');
+        font-weight: 600;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Barlow Condensed';
+        src: url('../public/fuentes/barlow-condensed-800.woff2') format('woff2');
+        font-weight: 800;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('../public/fuentes/inter-400.woff2') format('woff2');
+        font-weight: 400;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url('../public/fuentes/inter-600.woff2') format('woff2');
+        font-weight: 600;
+        font-display: block;
+      }
+
+      :root {
+        --verde-950: #03110a;
+        --verde-800: #0a2a1a;
+        --verde-600: #16573b;
+        --dorado: #c39350;
+        --dorado-claro: #e3bd82;
+        --crema: #e5e1de;
+        --blanco: #f7f7f7;
+        --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+        --texto: 'Inter', system-ui, sans-serif;
+      }
+
+      * { box-sizing: border-box; margin: 0; }
+
+      html, body { width: 1200px; height: 630px; overflow: hidden; }
+
+      body {
+        position: relative;
+        background: var(--verde-950);
+        font-family: var(--texto);
+        color: var(--crema);
+        display: flex;
+        align-items: center;
+        gap: 62px;
+        padding: 66px 74px;
+      }
+
+      /* Resplandor verde detrás del escudo: le da profundidad sin recargar. */
+      body::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(58% 76% at 17% 52%, rgb(22 87 59 / 0.55), transparent 72%),
+          radial-gradient(48% 60% at 92% 8%, rgb(195 147 80 / 0.10), transparent 70%);
+      }
+
+      /* Rayas diagonales: el mismo recurso del ticket y la barra del sitio. */
+      body::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          115deg,
+          rgb(255 255 255 / 0.022) 0 22px,
+          transparent 22px 44px
+        );
+      }
+
+      /* Filetes dorados arriba y abajo: el marco de la marca. */
+      .filete {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--dorado) 18%,
+          var(--dorado-claro) 50%,
+          var(--dorado) 82%,
+          transparent
+        );
+      }
+      .filete--arriba { top: 0; }
+      .filete--abajo { bottom: 0; }
+
+      .escudo {
+        position: relative;
+        z-index: 2;
+        height: 396px;
+        width: auto;
+        filter: drop-shadow(0 22px 42px rgb(0 0 0 / 0.72));
+      }
+
+      .bloque {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .liga {
+        font-family: var(--display);
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--dorado);
+      }
+
+      .grupo {
+        margin-top: 12px;
+        align-self: flex-start;
+        padding: 5px 13px;
+        border: 1px dashed rgb(195 147 80 / 0.55);
+        border-radius: 6px;
+        font-family: var(--display);
+        font-size: 19px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--dorado-claro);
+      }
+
+      .nombre {
+        margin-top: 20px;
+        font-family: var(--display);
+        font-size: 118px;
+        font-weight: 800;
+        line-height: 0.88;
+        letter-spacing: 0.005em;
+        text-transform: uppercase;
+        background: linear-gradient(178deg, var(--dorado-claro) 0%, var(--blanco) 42%, #c9c4bf 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .regla {
+        margin: 26px 0 22px;
+        width: 132px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--dorado), transparent);
+      }
+
+      .que {
+        max-width: 560px;
+        font-size: 25px;
+        line-height: 1.42;
+        color: rgb(229 225 222 / 0.74);
+      }
+
+      .direccion {
+        margin-top: 30px;
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--dorado-claro);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="filete filete--arriba"></div>
+    <div class="filete filete--abajo"></div>
+
+    <img class="escudo" src="../src/assets/escudo.webp" alt="Escudo de Real Betits" />
+
+    <div class="bloque">
+      <p class="liga">Zapping Liga Premier · Sábado 2° DIV</p>
+      <p class="grupo">Grupo B</p>
+      <p class="nombre">Real Betits</p>
+      <div class="regla"></div>
+      <p class="que">Formación, partidos, tabla y galería del equipo, jornada a jornada.</p>
+      <p class="direccion">real-betits.pages.dev</p>
+    </div>
+  </body>
+</html>

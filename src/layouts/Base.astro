@@ -8,6 +8,16 @@ interface Props {
 }
 
 const { titulo, descripcion = 'Real Betits — Zapping Liga Premier' } = Astro.props;
+
+/* URL absoluta de esta página, armada con `site` de astro.config.mjs. El dominio
+   no se escribe a mano acá: si algún día cambia, cambia en un solo lugar. */
+const url = new URL(Astro.url.pathname, Astro.site).href;
+
+/* Imagen de la vista previa al compartir. Es FIJA a propósito: WhatsApp,
+   Instagram y X la cachean durante semanas, así que no puede llevar datos que
+   cambien (el próximo partido, el marcador, la posición en la tabla). Se
+   regenera con scripts/vista-previa.html. */
+const VISTA_PREVIA = new URL('/og.jpg', Astro.site).href;
 ---
 
 <!doctype html>
@@ -37,6 +47,27 @@ const { titulo, descripcion = 'Real Betits — Zapping Liga Premier' } = Astro.p
     <meta name="generator" content={Astro.generator} />
     <title>{titulo}</title>
     <meta name="description" content={descripcion} />
+
+    {/* Vista previa al compartir el link (WhatsApp, Instagram, X, LinkedIn).
+        Sin esto, el link sale como una URL pelada y no como una tarjeta. */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Real Betits" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={VISTA_PREVIA} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Escudo de Real Betits con el nombre del equipo, la liga y la dirección del sitio"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titulo} />
+    <meta name="twitter:description" content={descripcion} />
+    <meta name="twitter:image" content={VISTA_PREVIA} />
     {/* Slot con nombre: las páginas pueden inyectar cosas acá (ej: el router
         de transiciones). Si nadie pone nada, no pasa nada. */}
     <slot name="head" />
