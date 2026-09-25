@@ -26,3 +26,57 @@
 
 # El HTML NO va aca a proposito: cambia en cada deploy y el default de
 # Cloudflare (max-age=0, must-revalidate) es exactamente lo que se quiere.
+
+
+# ==========================================================================
+# SEGURIDAD
+# ==========================================================================
+
+# --- Por que la CSP esta escrita a mano y no la genera Astro -------------
+#
+# Astro trae `security.csp`, que calcula los hashes de sus scripts y estilos
+# y emite un <meta>. No se uso, por dos razones concretas:
+#
+#   1. Ese CSP no soporta <ClientRouter />, que es lo que hace el fundido
+#      entre paginas. La propia documentacion de Astro lo dice.
+#   2. El sitio tiene scripts y estilos EN LINEA (el del navbar, el visor de
+#      la galeria y los posicionamientos de la cancha con style=""). Con
+#      hashes, el navegador IGNORA 'unsafe-inline' de esa misma directiva, y
+#      los estilos en linea quedarian bloqueados.
+#
+# --- Que protege esta politica ------------------------------------------
+#
+#   script-src 'self'        la pagina no carga ni ejecuta codigo de otro origen
+#   style-src 'self'         los estilos vienen de aca, no de un CDN ajeno
+#   img-src / font-src       idem para imagenes y tipografias
+#   connect-src 'self'       el prefetch de <ClientRouter /> solo habla con este sitio
+#   object-src 'none'        sin plugins embebidos
+#   base-uri 'self'          nadie puede inyectar un <base> y redirigir los enlaces
+#   form-action 'none'       no hay formularios, y si apareciera uno no podria enviar
+#   frame-ancestors 'none'   la pagina no se puede embeber en un iframe ajeno
+#
+# --- Que NO protege, dicho sin adornos ----------------------------------
+#
+# 'unsafe-inline' en script-src permite un <script> en linea inyectado, o sea
+# que la defensa contra XSS queda parcial. Aca el riesgo es teorico: el sitio
+# no tiene entrada de usuario, ni formularios, ni HTML armado en el navegador.
+# El dia que tenga alguno, esta politica se aprieta y se revisan los estilos
+# en linea. La proteccion real de este sitio es que no hay nada que inyectar.
+#
+#   Cloudflare ya manda referrer-policy por su cuenta; se declara igual para
+#   que quede a la vista y no dependa del default del proveedor.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=(), payment=(), magnetometer=(), gyroscope=()
+
+# HSTS por un ano: el navegador no vuelve a intentar HTTP en este dominio.
+# Es seguro aca porque Cloudflare ya responde 301 de HTTP a HTTPS (verificado),
+# o sea que no hay nada que solo funcione sin cifrado.
+#
+# Sin `preload`: entrar a la lista de precarga de los navegadores es un
+# tramite aparte, dificil de deshacer, y no aporta nada que no de el max-age.
