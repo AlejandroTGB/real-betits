@@ -1,0 +1,15 @@
+# Real Betits · https://real-betits.pages.dev
+#
+# El contenido público (home, partidos, tabla, galería) se puede rastrear entero.
+
+User-agent: *
+Allow: /
+
+# Páginas de trabajo, no de contenido: no aportan nada a un buscador y no
+# queremos que aparezcan en resultados. La 404 no se bloquea a propósito: si la
+# bloqueáramos, el robot no podría ver el código 404 que la delata como basura.
+Disallow: /cancha
+Disallow: /estilo
+Disallow: /diagrama
+
+Sitemap: https://real-betits.pages.dev/sitemap-index.xml

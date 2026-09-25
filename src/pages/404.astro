@@ -1,0 +1,113 @@
+---
+/**
+ * Página 404.
+ *
+ * Cloudflare Pages la sirve con el código HTTP 404 para cualquier URL que no
+ * corresponda a un archivo del build. Antes de existir esto, el hosting
+ * respondía el home con un 200: un "soft 404" que convertía cualquier
+ * dirección inventada en una página indexable.
+ *
+ * El título usa jerga del dominio (fuera de juego) en vez de un "Error 404"
+ * pelado: dice lo mismo sin romper el tono del sitio.
+ */
+import Sitio from '../layouts/Sitio.astro';
+---
+
+<Sitio
+  titulo="Fuera de juego · Real Betits"
+  descripcion="La página que buscas no existe."
+>
+  <section class="fuera">
+    <p class="fuera__codigo">404</p>
+    <h1 class="fuera__titulo">Fuera de juego</h1>
+    <p class="fuera__texto">
+      La página que buscas no existe. Puede que el enlace esté viejo o que la
+      dirección tenga un error de tipeo.
+    </p>
+    <nav class="fuera__rutas" aria-label="Volver al sitio">
+      <a class="fuera__ruta" href="/">Volver al inicio</a>
+      <a class="fuera__ruta" href="/partidos/">Partidos</a>
+      <a class="fuera__ruta" href="/tabla/">Tabla</a>
+      <a class="fuera__ruta" href="/galeria/">Galería</a>
+    </nav>
+  </section>
+</Sitio>
+
+<style>
+  .fuera {
+    max-width: 660px;
+    /* La 404 es corta: sin esto el pie queda flotando a media ventana y el
+       resto se ve vacío. El descuento es navbar (65px) + pie (~124px) + aire.
+       Se declara dos veces a propósito: `svh` es el alto de la ventana sin la
+       barra del navegador móvil; donde no exista, queda el 58vh de arriba. */
+    min-height: 58vh;
+    min-height: calc(100svh - 210px);
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  /* El número grande va en dorado apagado: pesa menos que el titular, pero se
+     lee (a 0.22 de alfa desaparecía contra el fondo y parecía un error). */
+  .fuera__codigo {
+    margin: 0;
+    font-family: var(--fuente-display);
+    font-size: 132px;
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: 0.04em;
+    color: rgb(195 147 80 / 0.45);
+  }
+
+  .fuera__titulo {
+    margin: 0;
+    font-size: 46px;
+    font-weight: 800;
+    color: var(--blanco);
+  }
+
+  .fuera__texto {
+    max-width: 46ch;
+    margin: 8px 0 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgb(229 225 222 / 0.72);
+  }
+
+  .fuera__rutas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .fuera__ruta {
+    padding: 10px 18px;
+    border: 1px solid rgb(195 147 80 / 0.35);
+    border-radius: var(--radio-chico);
+    font-family: var(--fuente-display);
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--dorado-claro);
+  }
+
+  .fuera__ruta:hover,
+  .fuera__ruta:focus-visible {
+    background: rgb(195 147 80 / 0.12);
+    color: var(--blanco);
+  }
+
+  @media (max-width: 560px) {
+    .fuera { padding: 64px 20px 88px; }
+    .fuera__codigo { font-size: 96px; }
+    .fuera__titulo { font-size: 34px; }
+  }
+</style>
