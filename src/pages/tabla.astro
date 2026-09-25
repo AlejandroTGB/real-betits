@@ -26,13 +26,13 @@ const otros = GRUPOS.filter((g) => !g.esNuestro);
 >
   <section class="seccion">
     <header class="seccion__cabecera">
-      <h2 class="seccion__titulo">Tabla</h2>
+      <h1 class="seccion__titulo">Tabla</h1>
     </header>
 
     {
       nuestro && (
         <div class="bloque">
-          <h3 class="bloque__titulo">Grupo {nuestro.nombre} · el nuestro</h3>
+          <h2 class="bloque__titulo">Grupo {nuestro.nombre} · el nuestro</h2>
           <TablaPosiciones filas={nuestro.filas} />
         </div>
       )
@@ -41,14 +41,14 @@ const otros = GRUPOS.filter((g) => !g.esNuestro);
     {
       otros.map((g) => (
         <div class="bloque">
-          <h3 class="bloque__titulo">Grupo {g.nombre}</h3>
+          <h2 class="bloque__titulo">Grupo {g.nombre}</h2>
           <TablaPosiciones filas={g.filas} />
         </div>
       ))
     }
 
     <div class="bloque">
-      <h3 class="bloque__titulo">Goleadores</h3>
+      <h2 class="bloque__titulo">Goleadores</h2>
       <TablaGoleadores />
     </div>
   </section>

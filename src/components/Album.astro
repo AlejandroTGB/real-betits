@@ -37,7 +37,7 @@ const medianas = await Promise.all(
 
 <section class="album">
   <header class="album__cabecera">
-    <h3 class="album__titulo">Fecha {album.fecha}</h3>
+    <h2 class="album__titulo">Fecha {album.fecha}</h2>
     <p class="album__marcador">
       Real Betits {marcador} {rival}
       {rotulo && <span class:list={['album__rotulo', `album__rotulo--${rotulo.toLowerCase()}`]}>{rotulo}</span>}
@@ -366,17 +366,17 @@ const medianas = await Promise.all(
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgb(229 225 222 / 0.5);
+    color: rgb(229 225 222 / 0.58);
   }
 
   .album__rotulo--ganado { color: var(--verde-brillo); }
-  .album__rotulo--perdido { color: #c0554f; }
+  .album__rotulo--perdido { color: #d66a64; }
 
   .album__cuando {
     margin: 0;
     margin-left: auto;
     font-size: 12.5px;
-    color: rgb(229 225 222 / 0.5);
+    color: rgb(229 225 222 / 0.58);
   }
 
   .album__grilla {
@@ -412,7 +412,7 @@ const medianas = await Promise.all(
   .album__vacio {
     margin: 0;
     font-size: 14px;
-    color: rgb(229 225 222 / 0.55);
+    color: rgb(229 225 222 / 0.58);
   }
 
   .album__enlace {
@@ -518,7 +518,7 @@ const medianas = await Promise.all(
     font-family: var(--fuente-texto);
     font-size: 11.5px;
     letter-spacing: 0.08em;
-    color: rgb(229 225 222 / 0.5);
+    color: rgb(229 225 222 / 0.58);
   }
 
   .visor__flecha,

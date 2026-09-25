@@ -66,6 +66,6 @@ jobs:
           git commit -m "data: actualizar liga ($(date -u +%Y-%m-%d))" -m "$RESUMEN"
           git push
 
-      # Cuando exista el sitio, el deploy se dispara con el push de arriba.
-      # Si usas GitHub Pages, agrega acá los steps de build y deploy (o un
-      # workflow aparte que escuche a los cambios en data/).
+      # El push de arriba dispara solo el rebuild del sitio: Cloudflare Pages está
+      # conectado al repo y reconstruye con cada push a main. No hace falta ningún
+      # step de deploy acá.

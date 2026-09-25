@@ -73,10 +73,10 @@ La cadena, paso a paso:
 | `src/lib/` | Helpers de liga, plantilla, galería y escudos | código |
 | `src/components/` | Los 13 componentes `.astro` del sitio | código |
 | `src/layouts/` | `Base` (el `<head>`) y `Sitio` (navbar + footer) | código |
-| `src/pages/` | Las 6 rutas | código |
+| `src/pages/` | Las 6 rutas, más la página 404 | código |
 | `src/styles/` | `global.css` (tokens, secciones) y `fuentes.css` (`@font-face`) | código |
 | `src/assets/` | El escudo: PNG fuente y el WebP que se sirve | assets |
-| `public/` | Fuentes `.woff2` subseteadas, favicon, `_headers` y el diagrama interactivo | assets |
+| `public/` | Fuentes `.woff2` subseteadas, favicon, `robots.txt`, `_headers` y el diagrama interactivo | assets |
 | `scripts/` | Extracción de la liga y subseteo de fuentes | herramientas |
 | `.github/workflows/` | El Action del cron | automatización |
 | `docs/` | Capturas y el render del diagrama (PNG + fuente) | documentación |
@@ -165,6 +165,9 @@ antes de navegar. Ninguna de las dos versiones descarga JavaScript de framework.
 - **Las fotos son de la fotografía oficial de la liga**, publicadas en el Drive del torneo. El sitio
   muestra una selección de cada fecha y enlaza al álbum completo, que es donde están todas y en
   tamaño grande.
+- **El código va con licencia MIT** (ver [`LICENSE`](LICENSE)): se puede copiar, modificar y reusar.
+  Lo que la licencia **no** cubre son las fotos, el escudo ni los datos: eso es de la liga y de los
+  equipos.
 - **Los datos y los escudos pertenecen a Copa Fácil** y a los equipos de la división. Este repo solo
   los muestra.
 - **Esto es una parodia y no tiene ninguna relación con el Real Betis Balompié.** El nombre
