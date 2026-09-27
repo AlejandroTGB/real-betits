@@ -15,9 +15,11 @@
  * Ahora muestran la fecha, que es el dato que sí sirve para algo que no se jugó.
  *
  * Estados: G ganado · E empatado · P perdido · pendiente.
- * Y un quinto caso mezclado: jugado pero con el marcador incompleto (en la liga
- * hay 2 así). Esos caen en `pendiente` a propósito: preferimos no pintar un
- * color que no podemos afirmar.
+ * Quinto caso: jugado pero con el marcador incompleto. El script ya lo evita
+ * (el lado ausente es 0, porque en la liga "sin clave" significa "no marcó"),
+ * pero si igual llegara se dice "sin dato" y se pinta neutro. Lo que NO se
+ * puede decir es "sin jugar": sí se jugó, y eso fue un bug real — la F3 se
+ * mostraba como pendiente mientras la tabla la contaba como derrota 0-7.
  */
 import { JORNADAS, resultado, marcadorTexto, fechaCorta } from '../lib/liga';
 
@@ -37,7 +39,8 @@ const ROTULO: Record<string, string> = { G: 'Ganado', E: 'Empate', P: 'Perdido' 
               {j.nuestro.jugado ? marcadorTexto(j.nuestro) : fechaCorta(j.nuestro.fecha)}
             </span>
             <span class="campana__rival">{j.rival}</span>
-            <span class="campana__estado">{r ? ROTULO[r] : 'sin jugar'}</span>
+            {/* si se jugó y falta el marcador, "sin dato"; "sin jugar" solo si no se jugó */}
+            <span class="campana__estado">{r ? ROTULO[r] : j.nuestro.jugado ? 'sin dato' : 'sin jugar'}</span>
           </li>
         );
       })

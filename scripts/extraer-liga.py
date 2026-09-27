@@ -362,6 +362,7 @@ def main():
     # --- fixture ---
     fixture = []
     for k, v in sub.items():
+        jugado = v.get("st") == 3
         dtx = v.get("dt") or {}
         fixture.append({
             "id": k,
@@ -369,9 +370,17 @@ def main():
             "ronda_id": v.get("m_set"),
             "equipo1": MAPPING.get(v["team1"], v["team1"]),
             "equipo2": MAPPING.get(v["team2"], v["team2"]),
-            "goles1": dtx.get("qt_g1"),
-            "goles2": dtx.get("qt_g2"),
-            "jugado": v.get("st") == 3,
+            # OJO: la app guarda los goles por eventos, así que un equipo que NO
+            # marcó llega sin la clave (no como 0). Comprobado contra la API: en
+            # los 11 casos con un lado ausente, el ausente es el que perdió.
+            # Va 0, igual que en construir_tabla(). Si acá quedara null, la tabla
+            # diría "0-7" y la tarjeta diría "sin jugar" — dos verdades opuestas
+            # sobre el mismo partido.
+            # El default va CONDICIONADO a jugado: en un pendiente no hay marcador,
+            # y un 0-0 falso haría creer que se jugó.
+            "goles1": dtx.get("qt_g1", 0) if jugado else None,
+            "goles2": dtx.get("qt_g2", 0) if jugado else None,
+            "jugado": jugado,
         })
     fixture.sort(key=lambda x: (x["fecha"] or "9999", x["id"]))
 

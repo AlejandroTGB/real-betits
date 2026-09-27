@@ -204,7 +204,7 @@
    "equipo1": "ATLETICO CIRUJA",
    "equipo2": "AC DEPORTES TE COJO",
    "goles1": 4,
-   "goles2": null,
+   "goles2": 0,
    "jugado": true
   },
   {
@@ -253,7 +253,7 @@
    "ronda_id": "1787705109194",
    "equipo1": "ATLETICO CIRUJA",
    "equipo2": "BPC FC",
-   "goles1": null,
+   "goles1": 0,
    "goles2": 1,
    "jugado": true
   },
@@ -303,7 +303,7 @@
    "ronda_id": "1787705109195",
    "equipo1": "LOS NOTA LOKOS",
    "equipo2": "PICHULENSE FC",
-   "goles1": null,
+   "goles1": 0,
    "goles2": 4,
    "jugado": true
   },
@@ -323,7 +323,7 @@
    "ronda_id": "1787705109195",
    "equipo1": "REAL BETITS",
    "equipo2": "ATLETICO CIRUJA",
-   "goles1": null,
+   "goles1": 0,
    "goles2": 7,
    "jugado": true
   },
