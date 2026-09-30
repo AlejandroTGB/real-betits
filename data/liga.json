@@ -534,10 +534,46 @@
    "fotos_en_nuestra_carpeta": 41
   },
   {
+   "titulo": "Fotos Fecha 3 ⚽️🔥 26/09",
+   "division": "x31w3",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005408633695820.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1KpLP8iCjQ7vlfUgPxeKptFPtMBVaxIPa?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 3 ⚽️🔥1ra Div 26/09",
+   "division": "bpsgp",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005408633922907.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/16mT4Hyw6qTFyol3uw8Ciw8o3IYldg-0I?usp=share_link",
+   "es_mi_division": false
+  },
+  {
    "titulo": "Fotos Fecha 3 ⚽️🔥21/09",
    "division": "4amy",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005409160038192.jpg?alt=media",
    "album": "https://drive.google.com/drive/folders/1CzlWPK2BrklCHS5X1Wue00kkioamVFkO?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 3 ⚽️🔥25/09",
+   "division": "fkfiu",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005408634039714.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1IUXQkYpMzwMKllj5lHcLRP0k3tqhGBjS?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 3 ⚽️🔥2da div 26/07",
+   "division": "x7miv",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005408633798939.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/16mT4Hyw6qTFyol3uw8Ciw8o3IYldg-0I?usp=share_link",
+   "es_mi_division": true,
+   "carpeta": null
+  },
+  {
+   "titulo": "Fotos Fecha 4 ⚽️🔥 28/09",
+   "division": "4amy",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005408476954204.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1A0BVNhpQlbWVTPHatC-gC_xPlqgirD3p?usp=share_link",
    "es_mi_division": false
   }
  ]
