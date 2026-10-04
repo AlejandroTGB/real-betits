@@ -11,148 +11,148 @@
    {
     "pos": 1,
     "equipo": "PICHULENSE FC",
-    "pts": 9,
-    "pj": 3,
+    "pts": 10,
+    "pj": 4,
     "w": 3,
-    "d": 0,
+    "d": 1,
     "l": 0,
-    "gf": 15,
-    "ga": 2,
+    "gf": 17,
+    "ga": 4,
     "gd": 13
    },
    {
     "pos": 2,
     "equipo": "COLGATE",
-    "pts": 9,
-    "pj": 3,
+    "pts": 10,
+    "pj": 4,
     "w": 3,
-    "d": 0,
+    "d": 1,
     "l": 0,
-    "gf": 16,
-    "ga": 10,
+    "gf": 18,
+    "ga": 12,
     "gd": 6
    },
    {
     "pos": 3,
-    "equipo": "LOS NOTA LOKOS",
-    "pts": 3,
-    "pj": 3,
-    "w": 1,
+    "equipo": "BÁRBAROS DE ÉLITE",
+    "pts": 6,
+    "pj": 4,
+    "w": 2,
     "d": 0,
     "l": 2,
-    "gf": 8,
-    "ga": 11,
-    "gd": -3
+    "gf": 15,
+    "ga": 15,
+    "gd": 0
    },
    {
     "pos": 4,
-    "equipo": "BÁRBAROS DE ÉLITE",
-    "pts": 3,
-    "pj": 3,
+    "equipo": "LOS NOTA LOKOS",
+    "pts": 4,
+    "pj": 4,
     "w": 1,
-    "d": 0,
+    "d": 1,
     "l": 2,
-    "gf": 7,
-    "ga": 10,
+    "gf": 12,
+    "ga": 15,
     "gd": -3
    },
    {
     "pos": 5,
     "equipo": "LA SUTRONETA",
     "pts": 3,
-    "pj": 3,
+    "pj": 4,
     "w": 1,
     "d": 0,
-    "l": 2,
-    "gf": 9,
-    "ga": 18,
-    "gd": -9
+    "l": 3,
+    "gf": 14,
+    "ga": 26,
+    "gd": -12
    },
    {
     "pos": 6,
     "equipo": "AC WARISNAKE",
-    "pts": 0,
-    "pj": 3,
+    "pts": 1,
+    "pj": 4,
     "w": 0,
-    "d": 0,
+    "d": 1,
     "l": 3,
-    "gf": 5,
-    "ga": 9,
+    "gf": 9,
+    "ga": 13,
     "gd": -4
    }
   ],
   "B": [
    {
     "pos": 1,
-    "equipo": "ATLETICO CIRUJA",
-    "pts": 6,
-    "pj": 3,
-    "w": 2,
+    "equipo": "BPC FC",
+    "pts": 9,
+    "pj": 4,
+    "w": 3,
     "d": 0,
     "l": 1,
-    "gf": 11,
-    "ga": 1,
-    "gd": 10
+    "gf": 9,
+    "ga": 5,
+    "gd": 4
    },
    {
     "pos": 2,
-    "equipo": "BPC FC",
-    "pts": 6,
-    "pj": 3,
+    "equipo": "ATLETICO CIRUJA",
+    "pts": 7,
+    "pj": 4,
     "w": 2,
-    "d": 0,
+    "d": 1,
     "l": 1,
-    "gf": 6,
+    "gf": 14,
     "ga": 4,
-    "gd": 2
+    "gd": 10
    },
    {
     "pos": 3,
     "equipo": "REALISTIC DREAMS",
-    "pts": 6,
-    "pj": 3,
+    "pts": 7,
+    "pj": 4,
     "w": 2,
-    "d": 0,
+    "d": 1,
     "l": 1,
-    "gf": 8,
-    "ga": 7,
+    "gf": 11,
+    "ga": 10,
     "gd": 1
    },
    {
     "pos": 4,
-    "equipo": "DEPORTIVO RESACA",
-    "pts": 3,
-    "pj": 3,
-    "w": 1,
+    "equipo": "AC DEPORTES TE COJO",
+    "pts": 6,
+    "pj": 4,
+    "w": 2,
     "d": 0,
     "l": 2,
-    "gf": 7,
-    "ga": 9,
+    "gf": 9,
+    "ga": 11,
     "gd": -2
    },
    {
     "pos": 5,
-    "equipo": "AC DEPORTES TE COJO",
+    "equipo": "DEPORTIVO RESACA",
     "pts": 3,
-    "pj": 3,
+    "pj": 4,
     "w": 1,
     "d": 0,
-    "l": 2,
-    "gf": 5,
-    "ga": 10,
+    "l": 3,
+    "gf": 8,
+    "ga": 13,
     "gd": -5
    },
    {
     "pos": 6,
     "equipo": "REAL BETITS",
     "pts": 3,
-    "pj": 3,
+    "pj": 4,
     "w": 1,
     "d": 0,
-    "l": 2,
-    "gf": 7,
-    "ga": 13,
-    "gd": -6
+    "l": 3,
+    "gf": 8,
+    "ga": 16,
+    "gd": -8
    }
   ]
  },
@@ -343,9 +343,9 @@
    "ronda_id": "1787705109196",
    "equipo1": "AC DEPORTES TE COJO",
    "equipo2": "DEPORTIVO RESACA",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 4,
+   "goles2": 1,
+   "jugado": true
   },
   {
    "id": "1787705109220",
@@ -353,9 +353,9 @@
    "ronda_id": "1787705109196",
    "equipo1": "ATLETICO CIRUJA",
    "equipo2": "REALISTIC DREAMS",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 3,
+   "goles2": 3,
+   "jugado": true
   },
   {
    "id": "1787705109202",
@@ -363,9 +363,9 @@
    "ronda_id": "1787705109196",
    "equipo1": "LA SUTRONETA",
    "equipo2": "BÁRBAROS DE ÉLITE",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 5,
+   "goles2": 8,
+   "jugado": true
   },
   {
    "id": "1787705109203",
@@ -373,9 +373,9 @@
    "ronda_id": "1787705109196",
    "equipo1": "PICHULENSE FC",
    "equipo2": "COLGATE",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 2,
+   "goles2": 2,
+   "jugado": true
   },
   {
    "id": "1787705109204",
@@ -383,9 +383,9 @@
    "ronda_id": "1787705109196",
    "equipo1": "AC WARISNAKE",
    "equipo2": "LOS NOTA LOKOS",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 4,
+   "goles2": 4,
+   "jugado": true
   },
   {
    "id": "1787705109218",
@@ -393,13 +393,13 @@
    "ronda_id": "1787705109196",
    "equipo1": "REAL BETITS",
    "equipo2": "BPC FC",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 1,
+   "goles2": 3,
+   "jugado": true
   },
   {
    "id": "1787705109205",
-   "fecha": null,
+   "fecha": "2026-10-17 18:00",
    "ronda_id": "1787705109197",
    "equipo1": "BÁRBAROS DE ÉLITE",
    "equipo2": "PICHULENSE FC",
@@ -408,8 +408,18 @@
    "jugado": false
   },
   {
+   "id": "1787705109221",
+   "fecha": "2026-10-17 18:00",
+   "ronda_id": "1787705109197",
+   "equipo1": "BPC FC",
+   "equipo2": "AC DEPORTES TE COJO",
+   "goles1": null,
+   "goles2": null,
+   "jugado": false
+  },
+  {
    "id": "1787705109206",
-   "fecha": null,
+   "fecha": "2026-10-17 19:00",
    "ronda_id": "1787705109197",
    "equipo1": "LOS NOTA LOKOS",
    "equipo2": "LA SUTRONETA",
@@ -419,7 +429,7 @@
   },
   {
    "id": "1787705109207",
-   "fecha": null,
+   "fecha": "2026-10-17 19:00",
    "ronda_id": "1787705109197",
    "equipo1": "COLGATE",
    "equipo2": "AC WARISNAKE",
@@ -428,18 +438,8 @@
    "jugado": false
   },
   {
-   "id": "1787705109221",
-   "fecha": null,
-   "ronda_id": "1787705109197",
-   "equipo1": "BPC FC",
-   "equipo2": "AC DEPORTES TE COJO",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
-  },
-  {
    "id": "1787705109222",
-   "fecha": null,
+   "fecha": "2026-10-17 19:00",
    "ronda_id": "1787705109197",
    "equipo1": "REALISTIC DREAMS",
    "equipo2": "REAL BETITS",
@@ -449,7 +449,7 @@
   },
   {
    "id": "1787705109223",
-   "fecha": null,
+   "fecha": "2026-10-17 19:00",
    "ronda_id": "1787705109197",
    "equipo1": "DEPORTIVO RESACA",
    "equipo2": "ATLETICO CIRUJA",
@@ -534,7 +534,7 @@
    "fotos_en_nuestra_carpeta": 41
   },
   {
-   "titulo": "Fotos Fecha 3 ⚽️🔥 26/09",
+   "titulo": "Fotos Fecha 3 ⚽️🔥 27/09",
    "division": "x31w3",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005408633695820.jpg?alt=media",
    "album": "https://drive.google.com/drive/folders/1KpLP8iCjQ7vlfUgPxeKptFPtMBVaxIPa?usp=share_link",
@@ -568,6 +568,13 @@
    "album": "https://drive.google.com/drive/folders/16mT4Hyw6qTFyol3uw8Ciw8o3IYldg-0I?usp=share_link",
    "es_mi_division": true,
    "carpeta": null
+  },
+  {
+   "titulo": "Fotos Fecha 4 ⚽️🔥 02/10",
+   "division": "fkfiu",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005408194870484.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/16eW2uttgEs5Tr5DY4hD8nHM6Tbz8odDt?usp=share_link",
+   "es_mi_division": false
   },
   {
    "titulo": "Fotos Fecha 4 ⚽️🔥 28/09",
