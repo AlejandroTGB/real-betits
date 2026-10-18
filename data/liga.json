@@ -11,148 +11,148 @@
    {
     "pos": 1,
     "equipo": "PICHULENSE FC",
-    "pts": 10,
-    "pj": 4,
+    "pts": 11,
+    "pj": 5,
     "w": 3,
-    "d": 1,
+    "d": 2,
     "l": 0,
-    "gf": 17,
-    "ga": 4,
+    "gf": 21,
+    "ga": 8,
     "gd": 13
    },
    {
     "pos": 2,
     "equipo": "COLGATE",
     "pts": 10,
-    "pj": 4,
+    "pj": 5,
     "w": 3,
     "d": 1,
-    "l": 0,
-    "gf": 18,
-    "ga": 12,
-    "gd": 6
+    "l": 1,
+    "gf": 19,
+    "ga": 17,
+    "gd": 2
    },
    {
     "pos": 3,
     "equipo": "BÁRBAROS DE ÉLITE",
-    "pts": 6,
-    "pj": 4,
+    "pts": 7,
+    "pj": 5,
     "w": 2,
-    "d": 0,
+    "d": 1,
     "l": 2,
-    "gf": 15,
-    "ga": 15,
+    "gf": 19,
+    "ga": 19,
     "gd": 0
    },
    {
     "pos": 4,
     "equipo": "LOS NOTA LOKOS",
-    "pts": 4,
-    "pj": 4,
+    "pts": 5,
+    "pj": 5,
     "w": 1,
-    "d": 1,
+    "d": 2,
     "l": 2,
-    "gf": 12,
-    "ga": 15,
+    "gf": 16,
+    "ga": 19,
     "gd": -3
    },
    {
     "pos": 5,
-    "equipo": "LA SUTRONETA",
-    "pts": 3,
-    "pj": 4,
+    "equipo": "AC WARISNAKE",
+    "pts": 4,
+    "pj": 5,
     "w": 1,
-    "d": 0,
+    "d": 1,
     "l": 3,
     "gf": 14,
-    "ga": 26,
-    "gd": -12
+    "ga": 14,
+    "gd": 0
    },
    {
     "pos": 6,
-    "equipo": "AC WARISNAKE",
-    "pts": 1,
-    "pj": 4,
-    "w": 0,
+    "equipo": "LA SUTRONETA",
+    "pts": 4,
+    "pj": 5,
+    "w": 1,
     "d": 1,
     "l": 3,
-    "gf": 9,
-    "ga": 13,
-    "gd": -4
+    "gf": 18,
+    "ga": 30,
+    "gd": -12
    }
   ],
   "B": [
    {
     "pos": 1,
-    "equipo": "BPC FC",
-    "pts": 9,
-    "pj": 4,
+    "equipo": "REALISTIC DREAMS",
+    "pts": 10,
+    "pj": 5,
     "w": 3,
-    "d": 0,
+    "d": 1,
     "l": 1,
-    "gf": 9,
-    "ga": 5,
+    "gf": 18,
+    "ga": 14,
     "gd": 4
    },
    {
     "pos": 2,
-    "equipo": "ATLETICO CIRUJA",
-    "pts": 7,
-    "pj": 4,
-    "w": 2,
-    "d": 1,
-    "l": 1,
-    "gf": 14,
-    "ga": 4,
-    "gd": 10
-   },
-   {
-    "pos": 3,
-    "equipo": "REALISTIC DREAMS",
-    "pts": 7,
-    "pj": 4,
-    "w": 2,
-    "d": 1,
-    "l": 1,
-    "gf": 11,
-    "ga": 10,
-    "gd": 1
-   },
-   {
-    "pos": 4,
-    "equipo": "AC DEPORTES TE COJO",
-    "pts": 6,
-    "pj": 4,
-    "w": 2,
+    "equipo": "BPC FC",
+    "pts": 9,
+    "pj": 5,
+    "w": 3,
     "d": 0,
     "l": 2,
     "gf": 9,
+    "ga": 6,
+    "gd": 3
+   },
+   {
+    "pos": 3,
+    "equipo": "AC DEPORTES TE COJO",
+    "pts": 9,
+    "pj": 5,
+    "w": 3,
+    "d": 0,
+    "l": 2,
+    "gf": 10,
     "ga": 11,
-    "gd": -2
+    "gd": -1
+   },
+   {
+    "pos": 4,
+    "equipo": "ATLETICO CIRUJA",
+    "pts": 7,
+    "pj": 5,
+    "w": 2,
+    "d": 1,
+    "l": 2,
+    "gf": 17,
+    "ga": 9,
+    "gd": 8
    },
    {
     "pos": 5,
     "equipo": "DEPORTIVO RESACA",
-    "pts": 3,
-    "pj": 4,
-    "w": 1,
+    "pts": 6,
+    "pj": 5,
+    "w": 2,
     "d": 0,
     "l": 3,
-    "gf": 8,
-    "ga": 13,
-    "gd": -5
+    "gf": 13,
+    "ga": 16,
+    "gd": -3
    },
    {
     "pos": 6,
     "equipo": "REAL BETITS",
     "pts": 3,
-    "pj": 4,
+    "pj": 5,
     "w": 1,
     "d": 0,
-    "l": 3,
-    "gf": 8,
-    "ga": 16,
-    "gd": -8
+    "l": 4,
+    "gf": 12,
+    "ga": 23,
+    "gd": -11
    }
   ]
  },
@@ -403,9 +403,9 @@
    "ronda_id": "1787705109197",
    "equipo1": "BÁRBAROS DE ÉLITE",
    "equipo2": "PICHULENSE FC",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 4,
+   "goles2": 4,
+   "jugado": true
   },
   {
    "id": "1787705109221",
@@ -413,9 +413,9 @@
    "ronda_id": "1787705109197",
    "equipo1": "BPC FC",
    "equipo2": "AC DEPORTES TE COJO",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 0,
+   "goles2": 1,
+   "jugado": true
   },
   {
    "id": "1787705109206",
@@ -423,9 +423,9 @@
    "ronda_id": "1787705109197",
    "equipo1": "LOS NOTA LOKOS",
    "equipo2": "LA SUTRONETA",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 4,
+   "goles2": 4,
+   "jugado": true
   },
   {
    "id": "1787705109207",
@@ -433,9 +433,9 @@
    "ronda_id": "1787705109197",
    "equipo1": "COLGATE",
    "equipo2": "AC WARISNAKE",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 1,
+   "goles2": 5,
+   "jugado": true
   },
   {
    "id": "1787705109222",
@@ -443,9 +443,9 @@
    "ronda_id": "1787705109197",
    "equipo1": "REALISTIC DREAMS",
    "equipo2": "REAL BETITS",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 7,
+   "goles2": 4,
+   "jugado": true
   },
   {
    "id": "1787705109223",
@@ -453,9 +453,9 @@
    "ronda_id": "1787705109197",
    "equipo1": "DEPORTIVO RESACA",
    "equipo2": "ATLETICO CIRUJA",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 5,
+   "goles2": 3,
+   "jugado": true
   }
  ],
  "galeria": [
