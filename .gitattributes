@@ -1,0 +1,3 @@
+# El diagrama es una pieza única de 800 KB: sin esto, GitHub lo toma
+# como lenguaje principal del repositorio (aparecía como "HTML").
+public/diagrama/index.html linguist-detectable=false
