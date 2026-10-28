@@ -784,6 +784,13 @@
  ],
  "galeria": [
   {
+   "titulo": "Fotos Fecha 07 ⚽️🔥",
+   "division": "fkfiu",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406115177280.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1djIEwYZ7jElIpk3q6XVkxRrPHb2lEVWK?usp=share_link",
+   "es_mi_division": false
+  },
+  {
    "titulo": "Fotos Fecha 1 ⚽️🔥 31/08 ",
    "division": "4amy",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005410974105147.jpg?alt=media",
@@ -973,11 +980,33 @@
    "es_mi_division": false
   },
   {
+   "titulo": "Fotos Fecha 6 ⚽️🔥 25/10",
+   "division": "x31w3",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406197276606.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1_Alfe-5cLIy0pXspiqHyx-GlfEGx_T0l",
+   "es_mi_division": false
+  },
+  {
    "titulo": "Fotos Fecha 6 ⚽️🔥16/10",
    "division": "fkfiu",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406882584004.jpg?alt=media",
    "album": "https://drive.google.com/drive/folders/1DuzVzz-1QJwTO1JJTdwwJce75Q7crxIk?usp=share_link",
    "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 6 ⚽️🔥1ra Div 24/10",
+   "division": "bpsgp",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406143679859.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1sZ0ruBWmWNLYdC5KjdMnK2sg0LffrAzL?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 6 ⚽️🔥2da Div 24/10",
+   "division": "x7miv",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406143439097.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1sZ0ruBWmWNLYdC5KjdMnK2sg0LffrAzL?usp=share_link",
+   "es_mi_division": true,
+   "carpeta": null
   }
  ]
 }
