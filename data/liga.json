@@ -784,13 +784,6 @@
  ],
  "galeria": [
   {
-   "titulo": "Fotos Fecha 07 ⚽️🔥",
-   "division": "fkfiu",
-   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406115177280.jpg?alt=media",
-   "album": "https://drive.google.com/drive/folders/1djIEwYZ7jElIpk3q6XVkxRrPHb2lEVWK?usp=share_link",
-   "es_mi_division": false
-  },
-  {
    "titulo": "Fotos Fecha 1 ⚽️🔥 31/08 ",
    "division": "4amy",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005410974105147.jpg?alt=media",
@@ -1007,6 +1000,20 @@
    "album": "https://drive.google.com/drive/folders/1sZ0ruBWmWNLYdC5KjdMnK2sg0LffrAzL?usp=share_link",
    "es_mi_division": true,
    "carpeta": null
+  },
+  {
+   "titulo": "Fotos Fecha 7 ⚽️🔥 23/10",
+   "division": "fkfiu",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406115177280.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1djIEwYZ7jElIpk3q6XVkxRrPHb2lEVWK?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 8 ⚽️🔥 30/10",
+   "division": "fkfiu",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005405768277692.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1AaR8tK16RALzrhVfTMoApWKJ9au37B-Y?usp=share_link",
+   "es_mi_division": false
   }
  ]
 }
