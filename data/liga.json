@@ -722,6 +722,16 @@
    "jugado": true
   },
   {
+   "id": "1792354976330",
+   "fecha": "2026-11-14 18:00",
+   "ronda_id": "1792354976327",
+   "equipo1": "REAL BETITS",
+   "equipo2": "AC WARISNAKE",
+   "goles1": null,
+   "goles2": null,
+   "jugado": false
+  },
+  {
    "id": "1792354971324",
    "fecha": "2026-11-14 19:00",
    "ronda_id": "1792354971322",
@@ -767,16 +777,6 @@
    "ronda_id": "1792354976327",
    "equipo1": "LA SUTRONETA",
    "equipo2": "DEPORTIVO RESACA",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
-  },
-  {
-   "id": "1792354976330",
-   "fecha": "2026-11-14 20:00",
-   "ronda_id": "1792354976327",
-   "equipo1": "REAL BETITS",
-   "equipo2": "AC WARISNAKE",
    "goles1": null,
    "goles2": null,
    "jugado": false
@@ -1002,10 +1002,39 @@
    "carpeta": null
   },
   {
+   "titulo": "Fotos Fecha 7 ⚽️🔥 02/11",
+   "division": "4amy",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005404918656194.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/18kW217NuC-LGVY225mI8AC73tOtk_Tdk?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 7 ⚽️🔥 07/11",
+   "division": "bpsgp",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005405087835007.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1tJgjQrDMI-HaG7gw6sBbU97velunU6BI?usp=share_link",
+   "es_mi_division": false
+  },
+  {
    "titulo": "Fotos Fecha 7 ⚽️🔥 23/10",
    "division": "fkfiu",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005406115177280.jpg?alt=media",
    "album": "https://drive.google.com/drive/folders/1djIEwYZ7jElIpk3q6XVkxRrPHb2lEVWK?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 7 ⚽️🔥2da Div  07/11",
+   "division": "x7miv",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005405015558797.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1tJgjQrDMI-HaG7gw6sBbU97velunU6BI?usp=share_link",
+   "es_mi_division": true,
+   "carpeta": null
+  },
+  {
+   "titulo": "Fotos Fecha 8 ⚽️🔥 09/11",
+   "division": "4amy",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005404918555959.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1KnJvDgL4_-ZzjSGvFTCjNm6tNAsOQ2YY?usp=share_link",
    "es_mi_division": false
   },
   {
