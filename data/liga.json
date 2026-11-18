@@ -780,6 +780,36 @@
    "goles1": 3,
    "goles2": 1,
    "jugado": true
+  },
+  {
+   "id": "1794842691283",
+   "fecha": "2026-11-21 20:00",
+   "ronda_id": "1794842691283",
+   "equipo1": "COLGATE",
+   "equipo2": "PICHULENSE FC",
+   "goles1": null,
+   "goles2": null,
+   "jugado": false
+  },
+  {
+   "id": "1794842723595",
+   "fecha": "2026-11-21 20:00",
+   "ronda_id": "1794842723595",
+   "equipo1": "BÁRBAROS DE ÉLITE",
+   "equipo2": "LOS NOTA LOKOS",
+   "goles1": null,
+   "goles2": null,
+   "jugado": false
+  },
+  {
+   "id": "1794842771935",
+   "fecha": "2026-11-21 20:00",
+   "ronda_id": "1794842771935",
+   "equipo1": "LA SUTRONETA",
+   "equipo2": "DEPORTIVO RESACA",
+   "goles1": null,
+   "goles2": null,
+   "jugado": false
   }
  ],
  "galeria": [
@@ -1042,6 +1072,13 @@
    "division": "4amy",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005404918555959.jpg?alt=media",
    "album": "https://drive.google.com/drive/folders/1KnJvDgL4_-ZzjSGvFTCjNm6tNAsOQ2YY?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 8 ⚽️🔥 15/11",
+   "division": "x31w3",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005404400188447.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1Necu4kIZyQe467eMFtR0tdCUYk45Xy2-",
    "es_mi_division": false
   },
   {
