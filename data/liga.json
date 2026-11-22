@@ -11,41 +11,53 @@
    {
     "pos": 1,
     "equipo": "COLGATE",
-    "pts": 19,
-    "pj": 8,
+    "pts": 20,
+    "pj": 9,
     "w": 6,
-    "d": 1,
+    "d": 2,
     "l": 1,
-    "gf": 35,
-    "ga": 22,
+    "gf": 38,
+    "ga": 25,
     "gd": 13
    },
    {
     "pos": 2,
     "equipo": "PICHULENSE FC",
-    "pts": 18,
-    "pj": 8,
+    "pts": 19,
+    "pj": 9,
     "w": 5,
-    "d": 3,
+    "d": 4,
     "l": 0,
-    "gf": 35,
-    "ga": 12,
+    "gf": 38,
+    "ga": 15,
     "gd": 23
    },
    {
     "pos": 3,
     "equipo": "LOS NOTA LOKOS",
-    "pts": 14,
-    "pj": 8,
+    "pts": 15,
+    "pj": 9,
     "w": 4,
-    "d": 2,
+    "d": 3,
     "l": 2,
-    "gf": 31,
-    "ga": 22,
+    "gf": 32,
+    "ga": 23,
     "gd": 9
    },
    {
     "pos": 4,
+    "equipo": "DEPORTIVO RESACA",
+    "pts": 15,
+    "pj": 9,
+    "w": 5,
+    "d": 0,
+    "l": 4,
+    "gf": 23,
+    "ga": 25,
+    "gd": -2
+   },
+   {
+    "pos": 5,
     "equipo": "BPC FC",
     "pts": 13,
     "pj": 8,
@@ -57,31 +69,31 @@
     "gd": 8
    },
    {
-    "pos": 5,
+    "pos": 6,
     "equipo": "LA SUTRONETA",
     "pts": 13,
-    "pj": 8,
+    "pj": 9,
     "w": 4,
     "d": 1,
-    "l": 3,
-    "gf": 31,
-    "ga": 35,
-    "gd": -4
-   },
-   {
-    "pos": 6,
-    "equipo": "DEPORTIVO RESACA",
-    "pts": 12,
-    "pj": 8,
-    "w": 4,
-    "d": 0,
     "l": 4,
-    "gf": 21,
-    "ga": 24,
-    "gd": -3
+    "gf": 32,
+    "ga": 37,
+    "gd": -5
    },
    {
     "pos": 7,
+    "equipo": "BÁRBAROS DE ÉLITE",
+    "pts": 12,
+    "pj": 9,
+    "w": 3,
+    "d": 3,
+    "l": 3,
+    "gf": 38,
+    "ga": 32,
+    "gd": 6
+   },
+   {
+    "pos": 8,
     "equipo": "ATLETICO CIRUJA",
     "pts": 11,
     "pj": 8,
@@ -91,18 +103,6 @@
     "gf": 26,
     "ga": 18,
     "gd": 8
-   },
-   {
-    "pos": 8,
-    "equipo": "BÁRBAROS DE ÉLITE",
-    "pts": 11,
-    "pj": 8,
-    "w": 3,
-    "d": 2,
-    "l": 3,
-    "gf": 37,
-    "ga": 31,
-    "gd": 6
    },
    {
     "pos": 9,
@@ -157,41 +157,53 @@
    {
     "pos": 1,
     "equipo": "COLGATE",
-    "pts": 19,
-    "pj": 8,
+    "pts": 20,
+    "pj": 9,
     "w": 6,
-    "d": 1,
+    "d": 2,
     "l": 1,
-    "gf": 35,
-    "ga": 22,
+    "gf": 38,
+    "ga": 25,
     "gd": 13
    },
    {
     "pos": 2,
     "equipo": "PICHULENSE FC",
-    "pts": 18,
-    "pj": 8,
+    "pts": 19,
+    "pj": 9,
     "w": 5,
-    "d": 3,
+    "d": 4,
     "l": 0,
-    "gf": 35,
-    "ga": 12,
+    "gf": 38,
+    "ga": 15,
     "gd": 23
    },
    {
     "pos": 3,
     "equipo": "LOS NOTA LOKOS",
-    "pts": 14,
-    "pj": 8,
+    "pts": 15,
+    "pj": 9,
     "w": 4,
-    "d": 2,
+    "d": 3,
     "l": 2,
-    "gf": 31,
-    "ga": 22,
+    "gf": 32,
+    "ga": 23,
     "gd": 9
    },
    {
     "pos": 4,
+    "equipo": "DEPORTIVO RESACA",
+    "pts": 15,
+    "pj": 9,
+    "w": 5,
+    "d": 0,
+    "l": 4,
+    "gf": 23,
+    "ga": 25,
+    "gd": -2
+   },
+   {
+    "pos": 5,
     "equipo": "BPC FC",
     "pts": 13,
     "pj": 8,
@@ -203,31 +215,31 @@
     "gd": 8
    },
    {
-    "pos": 5,
+    "pos": 6,
     "equipo": "LA SUTRONETA",
     "pts": 13,
-    "pj": 8,
+    "pj": 9,
     "w": 4,
     "d": 1,
-    "l": 3,
-    "gf": 31,
-    "ga": 35,
-    "gd": -4
-   },
-   {
-    "pos": 6,
-    "equipo": "DEPORTIVO RESACA",
-    "pts": 12,
-    "pj": 8,
-    "w": 4,
-    "d": 0,
     "l": 4,
-    "gf": 21,
-    "ga": 24,
-    "gd": -3
+    "gf": 32,
+    "ga": 37,
+    "gd": -5
    },
    {
     "pos": 7,
+    "equipo": "BÁRBAROS DE ÉLITE",
+    "pts": 12,
+    "pj": 9,
+    "w": 3,
+    "d": 3,
+    "l": 3,
+    "gf": 38,
+    "ga": 32,
+    "gd": 6
+   },
+   {
+    "pos": 8,
     "equipo": "ATLETICO CIRUJA",
     "pts": 11,
     "pj": 8,
@@ -237,18 +249,6 @@
     "gf": 26,
     "ga": 18,
     "gd": 8
-   },
-   {
-    "pos": 8,
-    "equipo": "BÁRBAROS DE ÉLITE",
-    "pts": 11,
-    "pj": 8,
-    "w": 3,
-    "d": 2,
-    "l": 3,
-    "gf": 37,
-    "ga": 31,
-    "gd": 6
    },
    {
     "pos": 9,
@@ -787,9 +787,9 @@
    "ronda_id": "1794842691283",
    "equipo1": "COLGATE",
    "equipo2": "PICHULENSE FC",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 3,
+   "goles2": 3,
+   "jugado": true
   },
   {
    "id": "1794842723595",
@@ -797,9 +797,9 @@
    "ronda_id": "1794842723595",
    "equipo1": "BÁRBAROS DE ÉLITE",
    "equipo2": "LOS NOTA LOKOS",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 1,
+   "goles2": 1,
+   "jugado": true
   },
   {
    "id": "1794842771935",
@@ -807,9 +807,9 @@
    "ronda_id": "1794842771935",
    "equipo1": "LA SUTRONETA",
    "equipo2": "DEPORTIVO RESACA",
-   "goles1": null,
-   "goles2": null,
-   "jugado": false
+   "goles1": 1,
+   "goles2": 2,
+   "jugado": true
   }
  ],
  "galeria": [
