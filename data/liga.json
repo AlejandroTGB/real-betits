@@ -814,6 +814,27 @@
  ],
  "galeria": [
   {
+   "titulo": "Finales 1ra Div ⚽️🔥",
+   "division": "bpsgp",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005403877476309.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1toVpZirAYusMrc2AGH5BrTc3RLV0CsIl?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Finales 2da Div 🏆",
+   "division": "x7miv",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005403877672863.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1toVpZirAYusMrc2AGH5BrTc3RLV0CsIl?usp=share_link",
+   "es_mi_division": true
+  },
+  {
+   "titulo": "Finales y Premiaciones 🏆 22/11",
+   "division": "x31w3",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005403777243800.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1PdJlL9ABQs0AubyojKfsMMDPY8a36JHt?usp=share_link",
+   "es_mi_division": false
+  },
+  {
    "titulo": "Fotos Fecha 1 ⚽️🔥 31/08 ",
    "division": "4amy",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005410974105147.jpg?alt=media",
@@ -1089,11 +1110,40 @@
    "es_mi_division": false
   },
   {
+   "titulo": "Fotos Fecha 8 ⚽️🔥1ra Div 14/11",
+   "division": "bpsgp",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005403878073930.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1p9Dc-WtwDlqrBt56KzTY2_8rEMZMuJ2T?usp=share_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Fotos Fecha 8 ⚽️🔥2da Div 14/11",
+   "division": "x7miv",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005403877944079.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1p9Dc-WtwDlqrBt56KzTY2_8rEMZMuJ2T?usp=share_link",
+   "es_mi_division": true,
+   "carpeta": null
+  },
+  {
    "titulo": "Fotos Finales y Premiaciones 🏆🔥 06/11",
    "division": "fkfiu",
    "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005405139219979.jpg?alt=media",
    "album": "https://drive.google.com/drive/folders/1uEFqOChsgmsg_BdZ2b22cmCT7xI2TAA0?usp=share_link",
    "es_mi_division": false
+  },
+  {
+   "titulo": "Premiaciones 1ra Div🏆",
+   "division": "bpsgp",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005403877406036.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1o-CrFYiWKSM6k2tEiViDMIFY8HMWdmlA?usp=drive_link",
+   "es_mi_division": false
+  },
+  {
+   "titulo": "Premiaciones 2da Div 🏆",
+   "division": "x7miv",
+   "foto": "https://firebasestorage.googleapis.com/v0/b/copafacil-web.appspot.com/o/evts%2F-hdryi%2F9005403877816158.jpg?alt=media",
+   "album": "https://drive.google.com/drive/folders/1o-CrFYiWKSM6k2tEiViDMIFY8HMWdmlA?usp=drive_link",
+   "es_mi_division": true
   }
  ]
 }
